@@ -1,9 +1,9 @@
 /* Store service worker (hand-written, no build plugin needed).
    - Precaches the app shell + offline page
-   - Cache-first for static assets (JS/CSS/fonts/images)
+   - Cache-first for static assets, except Next.js build assets
    - Network-first for pages, falling back to the last cached copy
      (so previously viewed product pages still open offline) */
-const VERSION = "v2";
+const VERSION = "v3";
 const SHELL = `lc-shell-${VERSION}`;
 const PAGES = `lc-pages-${VERSION}`;
 const ASSETS = `lc-assets-${VERSION}`;
@@ -25,7 +25,6 @@ self.addEventListener("activate", (event) => {
 });
 
 const isStatic = (url) =>
-  url.pathname.startsWith("/_next/static/") ||
   url.pathname.startsWith("/icons/") ||
   /\.(?:woff2?|css|js|png|jpg|jpeg|webp|avif|svg|ico)$/.test(url.pathname);
 
@@ -36,6 +35,8 @@ self.addEventListener("fetch", (event) => {
   if (url.origin !== self.location.origin) return;
   // never cache admin, API or anything personal (cart, checkout, orders, account)
   if (/^\/(admin|api|account|cart|checkout)(\/|$)/.test(url.pathname)) return;
+  // Keep app chunks in sync with the current HTML, especially during development.
+  if (url.pathname.startsWith("/_next/")) return;
 
   if (req.mode === "navigate") {
     event.respondWith(
