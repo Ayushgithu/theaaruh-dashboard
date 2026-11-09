@@ -4,6 +4,7 @@ import { themeInitScript } from "@/hooks/use-theme";
 import { brandName } from "@/lib/brand";
 import "./globals.css";
 
+
 export const metadata: Metadata = {
   title: { default: "Admin", template: `%s | ${brandName} Admin` },
   applicationName: `${brandName} Admin`,
