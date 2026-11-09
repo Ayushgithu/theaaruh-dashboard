@@ -18,6 +18,8 @@ const tabs: ("all" | EnquiryStatus)[] = ["all", "new", "contacted", "closed"];
 
 export function EnquiryAdmin({ initial }: { initial: Enquiry[] }) {
   const [items, setItems] = React.useState<Enquiry[]>(initial);
+  // Keep the editable list aligned with server data after router.refresh().
+  // eslint-disable-next-line react-hooks/set-state-in-effect
   React.useEffect(() => setItems(initial), [initial]); // new enquiries arrive via router.refresh()
   const [tab, setTab] = React.useState<(typeof tabs)[number]>("all");
   const [q, setQ] = React.useState("");
@@ -42,7 +44,7 @@ export function EnquiryAdmin({ initial }: { initial: Enquiry[] }) {
       <AdminPageHeader title="Enquiries" description="Messages from the contact form, product enquiries and sell requests." />
 
       <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div role="tablist" aria-label="Filter by status" className="no-scrollbar flex gap-1 overflow-x-auto rounded-xl bg-card p-1 shadow-card ring-1 ring-line">
+        <div role="tablist" aria-label="Filter by status" className="no-scrollbar flex gap-1 overflow-x-auto rounded-sm bg-card p-1 shadow-card ring-1 ring-line">
           {tabs.map((t) => (
             <button key={t} role="tab" aria-selected={tab === t} onClick={() => setTab(t)}
               className={cn("min-h-10 shrink-0 rounded-lg px-4 text-sm font-medium capitalize transition", tab === t ? "bg-primary text-white" : "text-body hover:bg-surface")}>
@@ -57,15 +59,15 @@ export function EnquiryAdmin({ initial }: { initial: Enquiry[] }) {
       </div>
 
       {list.length === 0 ? (
-        <div className="flex flex-col items-center rounded-2xl border border-dashed border-line bg-card px-6 py-14 text-center">
-          <span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-primary-faint text-primary"><Inbox className="h-7 w-7" /></span>
+        <div className="flex flex-col items-center rounded-sm border border-dashed border-line bg-card px-6 py-14 text-center">
+          <span className="flex h-14 w-14 items-center justify-center rounded-sm bg-primary-faint text-primary"><Inbox className="h-7 w-7" /></span>
           <h2 className="mt-4 text-lg">No enquiries here</h2>
           <p className="mt-1 text-sm">Nothing matches this filter right now.</p>
           <Button variant="outline" className="mt-5" onClick={() => { setTab("all"); setQ(""); }}>Show all enquiries</Button>
         </div>
       ) : (
         <>
-          <div className="hidden overflow-x-auto rounded-2xl border border-line bg-card shadow-card md:block">
+          <div className="hidden overflow-x-auto rounded-sm border border-line bg-card shadow-card md:block">
             <table className="w-full min-w-[680px] text-sm">
               <thead className="bg-surface text-left text-xs font-semibold text-body">
                 <tr><th className="px-4 py-3">Customer</th><th className="px-4 py-3">Message</th><th className="px-4 py-3">Source</th><th className="px-4 py-3">Date</th><th className="px-4 py-3">Status</th></tr>
@@ -86,7 +88,7 @@ export function EnquiryAdmin({ initial }: { initial: Enquiry[] }) {
           <ul className="grid gap-3 md:hidden">
             {list.map((e) => (
               <li key={e.id}>
-                <button onClick={() => setOpen(e)} className="w-full rounded-2xl border border-line bg-card p-4 text-left shadow-card">
+                <button onClick={() => setOpen(e)} className="w-full rounded-sm border border-line bg-card p-4 text-left shadow-card">
                   <div className="flex items-start justify-between gap-3"><p className="font-semibold text-ink">{e.name}</p><StatusBadge status={e.status} /></div>
                   <p className="mt-1 line-clamp-2 text-sm">{e.message}</p>
                   <p className="mt-2 text-xs">{e.source} · {fmt(e.createdAt)}</p>
@@ -108,9 +110,9 @@ export function EnquiryAdmin({ initial }: { initial: Enquiry[] }) {
               <div><dt className="text-xs">Source</dt><dd className="mt-0.5 font-medium text-ink">{open.source}</dd></div>
               <div><dt className="text-xs">Received</dt><dd className="mt-0.5 font-medium text-ink">{fmt(open.createdAt)}</dd></div>
             </dl>
-            <div><p className="text-xs">Message</p><p className="mt-1 rounded-xl bg-surface p-4 text-sm leading-relaxed text-ink">{open.message}</p></div>
+            <div><p className="text-xs">Message</p><p className="mt-1 rounded-sm bg-surface p-4 text-sm leading-relaxed text-ink">{open.message}</p></div>
             {open.sell && (
-              <div className="rounded-xl border border-line p-4 text-sm">
+              <div className="rounded-sm border border-line p-4 text-sm">
                 <p className="font-semibold text-ink">{open.sell.brand} {open.sell.model}</p>
                 <p className="mt-1">Condition: {open.sell.condition}</p>
                 <p>Expected price: <span className="font-semibold text-ink">{formatPrice(open.sell.expectedPrice)}</span> · City: {open.sell.city}</p>

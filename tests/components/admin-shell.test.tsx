@@ -16,7 +16,7 @@ describe("<AdminShell />", () => {
       expect(screen.getAllByRole("link", { name })[0]).toBeInTheDocument();
     }
     expect(screen.getByText("Page body")).toBeInTheDocument();
-    expect(screen.getByText("owner@shop.com")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Account menu" })).toBeInTheDocument();
   });
 
   it("marks the current page (usePathname mocked as /admin)", () => {
@@ -29,7 +29,8 @@ describe("<AdminShell />", () => {
     const user = userEvent.setup();
     const fetchMock = mockFetch(() => ({}));
     render(<AdminShell admin={admin}>x</AdminShell>);
-    await user.click(screen.getByRole("button", { name: "Sign out" }));
+    await user.click(screen.getByRole("button", { name: "Account menu" }));
+    await user.click(within(screen.getByRole("menu")).getByRole("menuitem", { name: "Sign out" }));
     await waitFor(() => expect(router.replace).toHaveBeenCalledWith("/login"));
     expect(fetchMock).toHaveBeenCalledWith("/api/admin/logout", expect.objectContaining({ method: "POST" }));
   });

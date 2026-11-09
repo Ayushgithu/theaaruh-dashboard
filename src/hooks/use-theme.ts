@@ -1,31 +1,31 @@
 "use client";
 import * as React from "react";
+import { ACCENT_KEY, ACCENTS, metaColor } from "./accents";
 
 export type Theme = "light" | "dark";
 export const THEME_KEY = "lc_theme";
-const META_COLOR: Record<Theme, string> = { light: "#2563EB", dark: "#0B1220" };
 
 /** Applies the theme to <html> (class + colour-scheme + browser UI colour) and optionally remembers it. */
 export function applyTheme(theme: Theme, persist = true) {
   const root = document.documentElement;
   root.classList.toggle("dark", theme === "dark");
   root.style.colorScheme = theme;
-  document.querySelector('meta[name="theme-color"]')?.setAttribute("content", META_COLOR[theme]);
+  document.querySelector('meta[name="theme-color"]')?.setAttribute("content", metaColor(theme === "dark"));
   if (persist) {
     try { localStorage.setItem(THEME_KEY, theme); } catch {}
   }
 }
 
 const current = (): Theme => (document.documentElement.classList.contains("dark") ? "dark" : "light");
+const subscribeToTheme = (onChange: () => void) => {
+  const observer = new MutationObserver(onChange);
+  observer.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
+  return () => observer.disconnect();
+};
 
 export function useTheme() {
-  const [theme, setThemeState] = React.useState<Theme>("light");
-
+  const theme = React.useSyncExternalStore<Theme>(subscribeToTheme, current, () => "light");
   React.useEffect(() => {
-    setThemeState(current());
-    const observer = new MutationObserver(() => setThemeState(current()));
-    observer.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
-
     // Follow the device setting until the visitor picks a theme themselves.
     const mq = window.matchMedia("(prefers-color-scheme: dark)");
     const onSystem = (e: MediaQueryListEvent) => {
@@ -34,7 +34,7 @@ export function useTheme() {
       if (!saved) applyTheme(e.matches ? "dark" : "light", false);
     };
     mq.addEventListener?.("change", onSystem);
-    return () => { observer.disconnect(); mq.removeEventListener?.("change", onSystem); };
+    return () => { mq.removeEventListener?.("change", onSystem); };
   }, []);
 
   const toggle = React.useCallback(() => applyTheme(current() === "dark" ? "light" : "dark"), []);
@@ -42,4 +42,4 @@ export function useTheme() {
 }
 
 /** Runs before first paint (inline in <head>) so there is no white flash for dark-mode visitors. */
-export const themeInitScript = `(function(){try{var s=localStorage.getItem('${THEME_KEY}');var d=s?s==='dark':window.matchMedia('(prefers-color-scheme: dark)').matches;var r=document.documentElement;if(d){r.classList.add('dark');r.style.colorScheme='dark'}}catch(e){}})();`;
+export const themeInitScript = `(function(){try{var s=localStorage.getItem('${THEME_KEY}');var d=s?s==='dark':window.matchMedia('(prefers-color-scheme: dark)').matches;var r=document.documentElement;if(d){r.classList.add('dark');r.style.colorScheme='dark'}var a=localStorage.getItem('${ACCENT_KEY}');if(a&&a!=='green'&&${JSON.stringify(ACCENTS.map((x) => x.id))}.indexOf(a)>-1){r.setAttribute('data-accent',a)}}catch(e){}})();`;

@@ -24,7 +24,7 @@ export function Drawer({ open, onClose, title, side = "right", children, footer,
   // onClose is kept in a ref: parents often pass a new function on every render, and re-running this effect would
   // pull focus away from whatever the visitor is typing in.
   const closeRef = React.useRef(onClose);
-  closeRef.current = onClose;
+  React.useEffect(() => { closeRef.current = onClose; }, [onClose]);
   React.useEffect(() => {
     if (!open) return;
     const prev = document.body.style.overflow;
@@ -76,7 +76,7 @@ export function Drawer({ open, onClose, title, side = "right", children, footer,
             {side === "bottom" && <div className="mx-auto mt-2.5 h-1.5 w-10 rounded-full bg-slate-200" aria-hidden />}
             <div className="flex items-center justify-between border-b border-line px-5 py-3.5">
               <h2 className="text-base font-semibold">{title}</h2>
-              <button onClick={onClose} aria-label="Close" className="flex h-11 w-11 items-center justify-center rounded-xl text-body hover:bg-surface">
+              <button onClick={onClose} aria-label="Close" className="flex h-11 w-11 items-center justify-center rounded-sm text-body hover:bg-surface">
                 <X className="h-5 w-5" />
               </button>
             </div>
@@ -97,7 +97,7 @@ export function Dialog({ open, onClose, title, children, footer, wide }: {
   // onClose is kept in a ref: parents often pass a new function on every render, and re-running this effect would
   // pull focus away from whatever the visitor is typing in.
   const closeRef = React.useRef(onClose);
-  closeRef.current = onClose;
+  React.useEffect(() => { closeRef.current = onClose; }, [onClose]);
   React.useEffect(() => {
     if (!open) return;
     const prev = document.body.style.overflow;
@@ -122,7 +122,7 @@ export function Dialog({ open, onClose, title, children, footer, wide }: {
             role="dialog"
             aria-modal="true"
             aria-label={title}
-            className={cn("relative flex max-h-[92dvh] w-full flex-col rounded-t-3xl bg-card shadow-2xl outline-none sm:rounded-2xl", wide ? "sm:max-w-3xl" : "sm:max-w-lg")}
+            className={cn("relative flex max-h-[92dvh] w-full flex-col rounded-t-3xl bg-card shadow-2xl outline-none sm:rounded-sm", wide ? "sm:max-w-3xl" : "sm:max-w-lg")}
             initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 24 }}
@@ -130,7 +130,7 @@ export function Dialog({ open, onClose, title, children, footer, wide }: {
           >
             <div className="flex items-center justify-between border-b border-line px-5 py-3.5 sm:px-6">
               <h2 className="text-lg font-semibold">{title}</h2>
-              <button onClick={onClose} aria-label="Close" className="flex h-11 w-11 items-center justify-center rounded-xl text-body hover:bg-surface">
+              <button onClick={onClose} aria-label="Close" className="flex h-11 w-11 items-center justify-center rounded-sm text-body hover:bg-surface">
                 <X className="h-5 w-5" />
               </button>
             </div>

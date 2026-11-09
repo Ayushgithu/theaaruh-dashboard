@@ -72,7 +72,7 @@ function BannerForm({ banner, onSave, onCancel }: { banner: Banner | null; onSav
         )}
         <PhotoUpload files={files} onChange={(f) => setFiles(f.slice(-1))} max={1} />
       </div>
-      <div className="flex items-center justify-between rounded-xl border border-line bg-surface p-4">
+      <div className="flex items-center justify-between rounded-sm border border-line bg-surface p-4">
         <p className="text-sm font-semibold text-ink">Show on the website</p>
         <Switch checked={active} onChange={setActive} label="Show banner on website" />
       </div>
@@ -136,8 +136,8 @@ export function BannerAdmin({ initial }: { initial: Banner[] }) {
     <>
       <AdminPageHeader title="Banners" description="Offers shown in the rotating banner on the home page." action={<Button onClick={() => setEditing("new")}><Plus className="h-4 w-4" /> Add banner</Button>} />
       {items.length === 0 ? (
-        <div className="flex flex-col items-center rounded-2xl border border-dashed border-line bg-card px-6 py-14 text-center">
-          <span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-primary-faint text-primary"><ImageOff className="h-7 w-7" /></span>
+        <div className="flex flex-col items-center rounded-sm border border-dashed border-line bg-card px-6 py-14 text-center">
+          <span className="flex h-14 w-14 items-center justify-center rounded-sm bg-primary-faint text-primary"><ImageOff className="h-7 w-7" /></span>
           <h2 className="mt-4 text-lg">No banners yet</h2>
           <p className="mt-1 text-sm">Add an offer to feature it on the home page.</p>
           <Button className="mt-5" onClick={() => setEditing("new")}>Add banner</Button>
@@ -145,8 +145,8 @@ export function BannerAdmin({ initial }: { initial: Banner[] }) {
       ) : (
         <ul className="grid gap-4">
           {items.map((b) => (
-            <li key={b.id} className={cn("flex flex-col gap-4 rounded-2xl border border-line bg-card p-4 shadow-card sm:flex-row sm:items-center", !b.active && "opacity-75")}>
-              <div className={cn("relative h-28 w-full shrink-0 overflow-hidden rounded-xl bg-gradient-to-br sm:h-24 sm:w-44", themeCls[b.theme])}>
+            <li key={b.id} className={cn("flex flex-col gap-4 rounded-sm border border-line bg-card p-4 shadow-card sm:flex-row sm:items-center", !b.active && "opacity-75")}>
+              <div className={cn("relative h-28 w-full shrink-0 overflow-hidden rounded-sm bg-gradient-to-br sm:h-24 sm:w-44", themeCls[b.theme])}>
                 {b.image && /* eslint-disable-next-line @next/next/no-img-element */ <img src={b.image} alt="" className="absolute inset-0 h-full w-full object-cover" />}
                 <span className={cn("absolute inset-x-3 bottom-3 line-clamp-2 text-xs font-semibold", b.theme === "sky" ? "text-ink" : "text-white")}>{b.title}</span>
               </div>

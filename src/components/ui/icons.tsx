@@ -26,12 +26,8 @@ export const YoutubeIcon = (p: P) => (
   </svg>
 );
 
-/** Brand mark: laptop with a clinic cross on the screen. */
+/** Brand mark: the gold "A" logo (public/aaruh-logo.png). */
 export const LogoMark = ({ className }: { className?: string }) => (
-  <svg viewBox="0 0 48 48" className={className} aria-hidden>
-    <rect width="48" height="48" rx="13" fill="#2563EB" />
-    <rect x="11" y="13" width="26" height="17" rx="3" fill="none" stroke="#fff" strokeWidth="2.5" />
-    <path d="M7.5 35h33" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" />
-    <path d="M24 17.5v8M20 21.5h8" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" />
-  </svg>
+  // eslint-disable-next-line @next/next/no-img-element
+  <img src="/aaruh-logo.png" alt="" aria-hidden className={`${className ?? ""} object-contain`} />
 );

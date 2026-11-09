@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { SmoothScroll } from "@/components/smooth-scroll";
 
 import { brandName } from "@/lib/brand";
 
@@ -9,5 +8,5 @@ export const metadata: Metadata = {
 };
 
 export default function AdminRootLayout({ children }: { children: React.ReactNode }) {
-  return <div className="min-h-dvh bg-surface"><SmoothScroll />{children}</div>;
+  return <div className="admin-root min-h-dvh bg-surface">{children}</div>;
 }

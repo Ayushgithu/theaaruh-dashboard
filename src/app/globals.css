@@ -1,25 +1,27 @@
-@import "@fontsource-variable/inter";
+@import "@fontsource-variable/public-sans";
 @import "tailwindcss";
 
 @custom-variant dark (&:where(.dark, .dark *));
 
 @theme {
-  --font-sans: "Inter Variable", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-sans: "Public Sans Variable", "Public Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
 
-  --color-primary: #2563eb;
-  --color-primary-hover: #1d4ed8;
-  --color-primary-soft: #dbeafe;
-  --color-primary-faint: #eff6ff;
+  --color-primary: #15803d;
+  --color-primary-hover: #166534;
+  --color-primary-soft: #d3ecdb;
+  --color-primary-faint: #ecf7f0;
   --color-ink: #0f172a;
   --color-body: #475569;
-  --color-surface: #f8fafc;
+  --color-surface: #f6f8f7;
   --color-line: #e2e8f0;
   --color-success: #16a34a;
   --color-warning: #d97706;
   --color-whatsapp: #25d366;
   --color-card: #ffffff;
 
-  --shadow-card: 0 1px 2px rgb(15 23 42 / 0.04), 0 1px 3px rgb(15 23 42 / 0.06);
+  --shadow-card: none; /* QR-printer style: flat cards, thin border only */
+  --color-primary-light: #22c55e;
+  --color-primary-dark: #166534;
   --shadow-lift: 0 14px 32px -14px rgb(15 23 42 / 0.2);
 
   --animate-pulse-ring: pulse-ring 2.4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
@@ -52,9 +54,9 @@
     -webkit-text-size-adjust: 100%;
   }
   :root {
-    --page: #ffffff;
-    --skeleton-a: #eef2f7;
-    --skeleton-b: #f8fafc;
+    --page: #f6f8f7;
+    --skeleton-a: #e8eef0;
+    --skeleton-b: #f6f8f7;
     color-scheme: light;
   }
   body {
@@ -68,7 +70,7 @@
   }
   h1, h2, h3, h4 {
     color: var(--color-ink);
-    letter-spacing: -0.02em;
+    letter-spacing: -0.01em;
     line-height: 1.15;
     font-weight: 700;
   }
@@ -141,18 +143,22 @@
    ---------------------------------------------------------------------------- */
 .dark {
   color-scheme: dark;
-  --page: #0b1220;
-  --skeleton-a: #172036;
-  --skeleton-b: #22304d;
+  --page: #000000;
+  --skeleton-a: #0a0a0a;
+  --skeleton-b: #1a1a1a;
 
-  --color-card: #111b30;
-  --color-surface: #0b1220;
-  --color-ink: #f1f5f9;
-  --color-body: #a9b5c9;
-  --color-line: #26334d;
-  --color-primary-faint: #13233f;
-  --color-primary-soft: #1c3668;
-  --shadow-card: 0 1px 2px rgb(0 0 0 / 0.3), 0 1px 3px rgb(0 0 0 / 0.25);
+  --color-card: #0a0a0a;
+  --color-surface: #000000;
+  --color-ink: #ededed;
+  --color-body: #a1a1a1;
+  --color-line: #2e2e2e;
+  --color-primary: #15803d;
+  --color-primary-hover: #166534;
+  --color-primary-dark: #166534;
+  --color-primary-light: #22c55e;
+  --color-primary-faint: #12281b;
+  --color-primary-soft: #14532d;
+  --shadow-card: none;
   --shadow-lift: 0 14px 32px -14px rgb(0 0 0 / 0.6);
 
   /* tinted status colours used by badges, alerts and warning cards */
@@ -161,17 +167,22 @@
   --color-amber-50: #2d2108;    --color-amber-200: #78350f;    --color-amber-700: #fcd34d;
   --color-blue-50: #0f2347;     --color-blue-200: #1e3a8a;     --color-blue-700: #93c5fd;
   --color-red-50: #3b1114;      --color-red-100: #4c1519;      --color-red-400: #f87171;   --color-red-600: #f87171;  --color-red-700: #fca5a5;
-  --color-slate-100: #1e293b;   --color-slate-200: #334155;    --color-slate-300: #475569;
-  --color-slate-500: #94a3b8;   --color-slate-500: #8b9ab3;  --color-slate-600: #cbd5e1;
+  --color-slate-100: #1a1a1a;   --color-slate-200: #262626;    --color-slate-300: #404040;
+  --color-slate-500: #8f8f8f;   --color-slate-600: #d4d4d4;
+  --accent-text: #4ade80;
+  --accent-placeholder: #707070;
 }
 
 /* Blue text needs to be lighter on dark surfaces to stay readable (buttons keep the solid brand blue). */
 .dark .text-primary,
 .dark .hover\:text-primary:hover,
 .dark .group:hover .group-hover\:text-primary {
-  color: #7db3ff;
+  color: var(--accent-text);
 }
-.dark ::placeholder { color: #8a98b0; }
+.dark ::placeholder { color: var(--accent-placeholder); }
+
+/* Admin dashboard uses plain native scrolling (no smooth scroll) */
+html:has(.admin-root) { scroll-behavior: auto; }
 
 /* ---- Lenis smooth scroll ---- */
 html.lenis, html.lenis body { height: auto; }
@@ -182,4 +193,77 @@ html.lenis, html.lenis body { height: auto; }
 @media (prefers-reduced-motion: reduce) {
   .marquee { overflow-x: auto; }
   .marquee-track { animation: none; }
+}
+
+/* Slim scrollbar for the left navigation */
+.nav-scroll { scrollbar-width: thin; scrollbar-color: transparent transparent; }
+.nav-scroll:hover { scrollbar-color: var(--color-line) transparent; }
+.nav-scroll::-webkit-scrollbar { width: 4px; }
+.nav-scroll::-webkit-scrollbar-track { background: transparent; }
+.nav-scroll::-webkit-scrollbar-thumb { background: transparent; border-radius: 9999px; }
+.nav-scroll:hover::-webkit-scrollbar-thumb { background: var(--color-line); }
+
+/* ---- Accent colours (Settings > Appearance). Green is the default, so it has no attribute. ---- */
+:root:not(.dark)[data-accent="blue"] {
+  --color-primary: #2563eb; --color-primary-hover: #1d4ed8; --color-primary-dark: #1d4ed8;
+  --color-primary-light: #3b82f6; --color-primary-soft: #dbeafe; --color-primary-faint: #eff6ff;
+}
+.dark[data-accent="blue"] {
+  --color-primary: #1d4ed8; --color-primary-hover: #1e40af; --color-primary-dark: #1e40af;
+  --color-primary-light: #3b82f6; --color-primary-soft: #1e3a8a; --color-primary-faint: #0f1d3d;
+  --accent-text: #93c5fd;
+}
+:root:not(.dark)[data-accent="orange"] {
+  --color-primary: #c2410c; --color-primary-hover: #9a3412; --color-primary-dark: #9a3412;
+  --color-primary-light: #f97316; --color-primary-soft: #fed7aa; --color-primary-faint: #fff4ed;
+}
+.dark[data-accent="orange"] {
+  --color-primary: #c2410c; --color-primary-hover: #9a3412; --color-primary-dark: #9a3412;
+  --color-primary-light: #f97316; --color-primary-soft: #7c2d12; --color-primary-faint: #2a1508;
+  --accent-text: #fdba74;
+}
+:root:not(.dark)[data-accent="purple"] {
+  --color-primary: #7e22ce; --color-primary-hover: #6b21a8; --color-primary-dark: #6b21a8;
+  --color-primary-light: #a855f7; --color-primary-soft: #e9d5ff; --color-primary-faint: #f5edff;
+}
+.dark[data-accent="purple"] {
+  --color-primary: #7e22ce; --color-primary-hover: #6b21a8; --color-primary-dark: #6b21a8;
+  --color-primary-light: #a855f7; --color-primary-soft: #3b0764; --color-primary-faint: #1d0f33;
+  --accent-text: #d8b4fe;
+}
+:root:not(.dark)[data-accent="maroon"] {
+  --color-primary: #8c1d40; --color-primary-hover: #741834; --color-primary-dark: #741834;
+  --color-primary-light: #a8284f; --color-primary-soft: #f3d3dc; --color-primary-faint: #fbeef2;
+}
+.dark[data-accent="maroon"] {
+  --color-primary: #8c1d40; --color-primary-hover: #741834; --color-primary-dark: #741834;
+  --color-primary-light: #a8284f; --color-primary-soft: #4a1a2c; --color-primary-faint: #2a1620;
+  --accent-text: #f4799f;
+}
+:root:not(.dark)[data-accent="teal"] {
+  --color-primary: #0f766e; --color-primary-hover: #115e59; --color-primary-dark: #115e59;
+  --color-primary-light: #14b8a6; --color-primary-soft: #ccefea; --color-primary-faint: #ecfaf8;
+}
+.dark[data-accent="teal"] {
+  --color-primary: #0f766e; --color-primary-hover: #115e59; --color-primary-dark: #115e59;
+  --color-primary-light: #14b8a6; --color-primary-soft: #134e4a; --color-primary-faint: #0c2624;
+  --accent-text: #5eead4;
+}
+:root:not(.dark)[data-accent="pink"] {
+  --color-primary: #be185d; --color-primary-hover: #9d174d; --color-primary-dark: #9d174d;
+  --color-primary-light: #ec4899; --color-primary-soft: #fbcfe8; --color-primary-faint: #fdf0f7;
+}
+.dark[data-accent="pink"] {
+  --color-primary: #be185d; --color-primary-hover: #9d174d; --color-primary-dark: #9d174d;
+  --color-primary-light: #ec4899; --color-primary-soft: #500724; --color-primary-faint: #2a0f1d;
+  --accent-text: #f9a8d4;
+}
+:root:not(.dark)[data-accent="gold"] {
+  --color-primary: #a16207; --color-primary-hover: #854d0e; --color-primary-dark: #854d0e;
+  --color-primary-light: #eab308; --color-primary-soft: #fde9a8; --color-primary-faint: #fef9e7;
+}
+.dark[data-accent="gold"] {
+  --color-primary: #a16207; --color-primary-hover: #854d0e; --color-primary-dark: #854d0e;
+  --color-primary-light: #eab308; --color-primary-soft: #713f12; --color-primary-faint: #261c07;
+  --accent-text: #fcd34d;
 }

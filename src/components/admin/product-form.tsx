@@ -137,7 +137,7 @@ export function ProductForm({ type, product, categories = [], onSave, onCancel }
       </div>
 
       {clothing && (
-        <div className="rounded-xl border border-line p-4">
+        <div className="rounded-sm border border-line p-4">
           <p className="text-sm font-semibold text-ink">Sizes &amp; stock</p>
           <p className="mb-3 text-xs">Tap the sizes you stitch, then enter how many pieces you have in each. Customers must choose a size to order.</p>
           <div className="flex flex-wrap gap-2">
@@ -167,7 +167,7 @@ export function ProductForm({ type, product, categories = [], onSave, onCancel }
         </div>
       )}
 
-      <fieldset className="rounded-xl border border-line p-4">
+      <fieldset className="rounded-sm border border-line p-4">
         <legend className="px-1 text-sm font-semibold text-ink">Colours</legend>
         <div className="space-y-2">
           {colors.map((c, i) => (
@@ -176,7 +176,7 @@ export function ProductForm({ type, product, categories = [], onSave, onCancel }
               <Input aria-label="Colour name" placeholder="Colour name, e.g. Maroon" value={c.name} onChange={(e) => setColors((cur) => cur.map((x, j) => (j === i ? { ...x, name: e.target.value } : x)))} />
               <Button type="button" variant="ghost" size="icon" aria-label="Remove colour" onClick={() => setColors((cur) => cur.filter((_, j) => j !== i))}><X className="h-4 w-4" /></Button>
             </div>
-            <div className="ml-14 rounded-xl bg-surface p-3">
+            <div className="ml-14 rounded-sm bg-surface p-3">
               <p className="mb-2 text-xs font-medium text-ink">Photos of this colour (optional) — shown when a customer picks {c.name || "this colour"}</p>
               {c.images.length > 0 && (
                 <ul className="mb-2 flex flex-wrap gap-2">{c.images.map((url) => (
@@ -203,11 +203,11 @@ export function ProductForm({ type, product, categories = [], onSave, onCancel }
       )}
 
       <div className="grid gap-3 sm:grid-cols-2">
-        <div className="flex items-center justify-between gap-3 rounded-xl border border-line bg-surface p-4">
+        <div className="flex items-center justify-between gap-3 rounded-sm border border-line bg-surface p-4">
           <div><p className="flex items-center gap-1.5 text-sm font-semibold text-ink"><Star className="h-3.5 w-3.5 text-amber-500" /> Featured</p><p className="text-xs">Show under Best sellers on the home page.</p></div>
           <Switch checked={featured} onChange={setFeatured} label="Featured on home page" />
         </div>
-        <fieldset className="rounded-xl border border-line p-4">
+        <fieldset className="rounded-sm border border-line p-4">
           <legend className="px-1 text-sm font-semibold text-ink">Tags on the product card</legend>
           <div className="flex flex-wrap gap-x-5">
             {BADGES.map((b) => <Checkbox key={b} label={b} checked={badges.includes(b)} onChange={(c) => setBadges((cur) => (c ? [...cur, b] : cur.filter((x) => x !== b)))} />)}
@@ -215,7 +215,7 @@ export function ProductForm({ type, product, categories = [], onSave, onCancel }
         </fieldset>
       </div>
 
-      <fieldset className="rounded-xl border border-line p-4">
+      <fieldset className="rounded-sm border border-line p-4">
         <legend className="px-1 text-sm font-semibold text-ink">⚡ Flash sale (optional)</legend>
         <div className="flex items-center justify-between gap-3"><p className="text-xs">A special price for this product only, with its own countdown. When the timer ends, the normal price comes back by itself.</p><Switch checked={flashOn} onChange={setFlashOn} label="Flash sale" /></div>
         {flashOn && (
@@ -227,8 +227,8 @@ export function ProductForm({ type, product, categories = [], onSave, onCancel }
       </fieldset>
 
       <div className="grid gap-3 sm:grid-cols-2">
-        <div className="flex items-center justify-between gap-3 rounded-xl border border-line bg-surface p-4"><div><p className="text-sm font-semibold text-ink">Allow return (refund)</p><p className="text-xs">Switch off for sale or custom pieces.</p></div><Switch checked={returnable} onChange={setReturnable} label="Allow return" /></div>
-        <div className="flex items-center justify-between gap-3 rounded-xl border border-line bg-surface p-4"><div><p className="text-sm font-semibold text-ink">Allow exchange</p><p className="text-xs">Customers can swap for another size.</p></div><Switch checked={exchangeable} onChange={setExchangeable} label="Allow exchange" /></div>
+        <div className="flex items-center justify-between gap-3 rounded-sm border border-line bg-surface p-4"><div><p className="text-sm font-semibold text-ink">Allow return (refund)</p><p className="text-xs">Switch off for sale or custom pieces.</p></div><Switch checked={returnable} onChange={setReturnable} label="Allow return" /></div>
+        <div className="flex items-center justify-between gap-3 rounded-sm border border-line bg-surface p-4"><div><p className="text-sm font-semibold text-ink">Allow exchange</p><p className="text-xs">Customers can swap for another size.</p></div><Switch checked={exchangeable} onChange={setExchangeable} label="Allow exchange" /></div>
       </div>
       <Field label="Product video link (optional)" hint="A YouTube link or a direct .mp4 link. It appears as a play button in the photo gallery — great for fabric close-ups and 360° turns."><Input value={videoUrl} onChange={(e) => setVideoUrl(e.target.value)} placeholder="https://youtube.com/shorts/…" /></Field>
 
@@ -254,7 +254,7 @@ export function ProductForm({ type, product, categories = [], onSave, onCancel }
         {existing.length > 0 && (
           <ul className="mb-3 grid grid-cols-3 gap-2 sm:grid-cols-5">
             {existing.map((url, i) => (
-              <li key={url} className="relative aspect-[3/4] overflow-hidden rounded-xl border border-line">
+              <li key={url} className="relative aspect-[3/4] overflow-hidden rounded-sm border border-line">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={url} alt={`Photo ${i + 1}`} className="h-full w-full object-cover" />
                 {i === 0 && <span className="absolute bottom-1 left-1 rounded-md bg-primary px-1.5 py-0.5 text-[10px] font-semibold text-white">Cover</span>}

@@ -1,9 +1,10 @@
 import { IndianRupee, Percent, ShoppingBag, Shirt } from "lucide-react";
 import type { Bar, Insights } from "@/lib/insights";
 import { formatPrice } from "@/lib/utils";
+import { StatCard } from "@/components/ui/stat-card";
 
 function Card({ title, hint, children }: { title: string; hint?: string; children: React.ReactNode }) {
-  return <section className="rounded-2xl border border-line bg-card p-5 shadow-card"><h2 className="text-base">{title}</h2>{hint && <p className="mt-0.5 text-xs">{hint}</p>}<div className="mt-4">{children}</div></section>;
+  return <section className="rounded-sm border border-line bg-card p-5 shadow-card"><h2 className="text-base">{title}</h2>{hint && <p className="mt-0.5 text-xs">{hint}</p>}<div className="mt-4">{children}</div></section>;
 }
 
 export function BarList({ rows, unit = "" }: { rows: Bar[]; unit?: string }) {
@@ -33,12 +34,7 @@ export function InsightsView({ data: d }: { data: Insights }) {
   return (
     <div className="space-y-4">
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        {stats.map(({ label, value, note, Icon }) => (
-          <div key={label} className="rounded-2xl border border-line bg-card p-5 shadow-card">
-            <div className="flex items-center justify-between"><p className="text-sm font-medium">{label}</p><span className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary-faint text-primary"><Icon className="h-5 w-5" /></span></div>
-            <p className="mt-3 text-2xl font-bold text-ink">{value}</p><p className="mt-1 text-xs">{note}</p>
-          </div>
-        ))}
+        {stats.map(({ label, value, note, Icon }) => <StatCard key={label} Icon={Icon} label={label} value={value} hint={note} />)}
       </div>
 
       <Card title="Sales per day" hint="Revenue from paid and confirmed orders">

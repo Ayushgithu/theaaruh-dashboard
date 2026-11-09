@@ -23,8 +23,6 @@ const isOpen = (path: string, href: string) => path === href || path.startsWith(
  */
 export function useAdminBadges(pathname: string): Badges {
   const [counts, setCounts] = React.useState<Badges>({ orders: 0, carts: 0, enquiries: 0, returns: 0 });
-  const pathRef = React.useRef(pathname);
-  pathRef.current = pathname;
 
   const poll = React.useCallback(async () => {
     if (document.visibilityState !== "visible") return;
@@ -36,19 +34,15 @@ export function useAdminBadges(pathname: string): Badges {
       const { now, counts: next } = (await r.json()) as { now: number; counts: Badges };
       const out: Badges = { orders: next.orders ?? 0, carts: next.carts ?? 0, enquiries: next.enquiries ?? 0, returns: next.returns ?? 0 };
       for (const s of SECTIONS) {
-        if (isOpen(pathRef.current, s.href) || read(s.key) === null) { write(s.key, now); out[s.key] = 0; }
+        if (isOpen(pathname, s.href) || read(s.key) === null) { write(s.key, now); out[s.key] = 0; }
       }
       setCounts(out);
     } catch { /* offline or signed out: try again next tick */ }
-  }, []);
+  }, [pathname]);
 
   React.useEffect(() => {
-    // clear the dot of the page just opened immediately, then let the server confirm
-    setCounts((c) => {
-      const open = SECTIONS.filter((s) => isOpen(pathname, s.href) && c[s.key] > 0);
-      return open.length ? { ...c, ...Object.fromEntries(open.map((s) => [s.key, 0])) } : c;
-    });
-    void poll();
+    const initialPoll = window.setTimeout(() => { void poll(); }, 0);
+    return () => window.clearTimeout(initialPoll);
   }, [pathname, poll]);
 
   React.useEffect(() => {
@@ -57,5 +51,9 @@ export function useAdminBadges(pathname: string): Badges {
     return () => { window.clearInterval(id); document.removeEventListener("visibilitychange", poll); };
   }, [poll]);
 
-  return counts;
+  const visibleCounts = { ...counts };
+  for (const section of SECTIONS) {
+    if (isOpen(pathname, section.href)) visibleCounts[section.key] = 0;
+  }
+  return visibleCounts;
 }

@@ -13,7 +13,7 @@ const toLocal = (iso: string) => { if (!iso) return ""; const d = new Date(iso);
 
 function Card({ title, hint, children }: { title: string; hint?: string; children: React.ReactNode }) {
   return (
-    <section className="rounded-2xl border border-line bg-card p-5 shadow-card sm:p-6">
+    <section className="rounded-sm border border-line bg-card p-5 shadow-card sm:p-6">
       <h2 className="text-lg">{title}</h2>
       {hint && <p className="mt-1 text-sm">{hint}</p>}
       <div className="mt-5 space-y-4">{children}</div>
@@ -21,7 +21,7 @@ function Card({ title, hint, children }: { title: string; hint?: string; childre
   );
 }
 const Row = ({ title, text, children }: { title: string; text?: string; children: React.ReactNode }) => (
-  <div className="flex items-center justify-between gap-4 rounded-xl border border-line bg-surface p-4"><div><p className="text-sm font-semibold text-ink">{title}</p>{text && <p className="text-xs">{text}</p>}</div>{children}</div>
+  <div className="flex items-center justify-between gap-4 rounded-sm border border-line bg-surface p-4"><div><p className="text-sm font-semibold text-ink">{title}</p>{text && <p className="text-xs">{text}</p>}</div>{children}</div>
 );
 
 export function StoreRulesAdmin({ initial }: { initial: StoreRules }) {
@@ -46,7 +46,7 @@ export function StoreRulesAdmin({ initial }: { initial: StoreRules }) {
 
   return (
     <>
-      <AdminPageHeader title="Store rules" description="Delivery, payments, returns, size chart and sale countdown — change them here and the website follows." action={<Button onClick={save} disabled={busy}>{busy ? <><Loader2 className="h-4 w-4 animate-spin" /> Saving…</> : "Save changes"}</Button>} />
+      <AdminPageHeader title="Store rules" description="Delivery, payments, returns, size chart and sale countdown — change them here and the website follows." />
 
       <div className="space-y-6 pb-24">
         <Card title="Delivery charges">
@@ -158,7 +158,7 @@ export function StoreRulesAdmin({ initial }: { initial: StoreRules }) {
         </Card>
       </div>
 
-      <div className="sticky bottom-0 -mx-4 border-t border-line bg-card/95 px-4 py-3 backdrop-blur sm:-mx-0 sm:rounded-2xl sm:border">
+      <div className="sticky bottom-0 -mx-4 border-t border-line bg-card/95 px-4 py-3 backdrop-blur sm:-mx-0 sm:rounded-sm sm:border">
         <Button onClick={save} disabled={busy} className="w-full sm:w-auto">{busy ? <><Loader2 className="h-4 w-4 animate-spin" /> Saving…</> : "Save changes"}</Button>
       </div>
     </>

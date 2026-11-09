@@ -59,24 +59,24 @@ export function CartsAdmin({ initial }: { initial: AdminCart[] }) {
       <AdminPageHeader title="Carts" description="Shoppers who added something to their bag but have not ordered — with everything we know about them. Updates by itself every few seconds." />
 
       <div className="mb-4 grid gap-3 sm:grid-cols-3">
-        <div className="rounded-2xl border border-line bg-card p-4 shadow-card"><p className="text-xs font-semibold">Carts right now</p><p className="mt-1 text-2xl font-bold text-ink" aria-live="polite"><strong className="font-bold">{initial.length}</strong> <span className="text-sm font-medium text-body">{initial.length === 1 ? "customer has" : "customers have"} items in their cart</span></p></div>
-        <div className="rounded-2xl border border-line bg-card p-4 shadow-card"><p className="text-xs font-semibold">Value waiting</p><p className="mt-1 text-2xl font-bold text-ink">{formatPrice(value)}</p></div>
-        <div className="rounded-2xl border border-line bg-card p-4 shadow-card"><p className="text-xs font-semibold">Worth a reminder</p><p className="mt-1 text-2xl font-bold text-primary">{recoverable.length}</p><p className="text-xs">signed-in, with a phone number, idle for 1h+ · {formatPrice(recoverable.reduce((n, c) => n + c.total, 0))}</p></div>
+        <div className="rounded-sm border border-line bg-card p-4 shadow-card"><p className="text-xs font-semibold">Carts right now</p><p className="mt-1 text-2xl font-bold text-ink" aria-live="polite"><strong className="font-bold">{initial.length}</strong> <span className="text-sm font-medium text-body">{initial.length === 1 ? "customer has" : "customers have"} items in their cart</span></p></div>
+        <div className="rounded-sm border border-line bg-card p-4 shadow-card"><p className="text-xs font-semibold">Value waiting</p><p className="mt-1 text-2xl font-bold text-ink">{formatPrice(value)}</p></div>
+        <div className="rounded-sm border border-line bg-card p-4 shadow-card"><p className="text-xs font-semibold">Worth a reminder</p><p className="mt-1 text-2xl font-bold text-primary">{recoverable.length}</p><p className="text-xs">signed-in, with a phone number, idle for 1h+ · {formatPrice(recoverable.reduce((n, c) => n + c.total, 0))}</p></div>
       </div>
 
       <div className="mb-4 flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-        <div role="tablist" aria-label="Filter carts" className="no-scrollbar flex gap-1 overflow-x-auto rounded-xl bg-card p-1 shadow-card ring-1 ring-line">
+        <div role="tablist" aria-label="Filter carts" className="no-scrollbar flex gap-1 overflow-x-auto rounded-sm bg-card p-1 shadow-card ring-1 ring-line">
           {TABS.map((t) => <button key={t.id} role="tab" aria-selected={tab === t.id} onClick={() => setTab(t.id)} className={cn("min-h-10 shrink-0 rounded-lg px-3.5 text-sm font-medium transition", tab === t.id ? "bg-primary text-white" : "text-body hover:bg-surface")}>{t.label} <span className={cn("ml-1 text-xs", tab === t.id ? "text-white/80" : "text-slate-500")}>{initial.filter(t.match).length}</span></button>)}
         </div>
         <div className="flex gap-2">
-          <select aria-label="Sort carts" value={sort} onChange={(e) => setSort(e.target.value as "recent" | "value")} className="h-11 rounded-xl border border-line bg-card px-3 text-sm font-medium text-ink"><option value="recent">Latest activity</option><option value="value">Highest value</option></select>
+          <select aria-label="Sort carts" value={sort} onChange={(e) => setSort(e.target.value as "recent" | "value")} className="h-11 rounded-sm border border-line bg-card px-3 text-sm font-medium text-ink"><option value="recent">Latest activity</option><option value="value">Highest value</option></select>
           <div className="relative w-full sm:w-64"><Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" /><Input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search customer or product" className="pl-10" aria-label="Search carts" /></div>
         </div>
       </div>
 
       {list.length === 0 ? (
-        <div className="flex flex-col items-center rounded-2xl border border-dashed border-line bg-card px-6 py-14 text-center">
-          <span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-primary-faint text-primary"><ShoppingCart className="h-7 w-7" /></span>
+        <div className="flex flex-col items-center rounded-sm border border-dashed border-line bg-card px-6 py-14 text-center">
+          <span className="flex h-14 w-14 items-center justify-center rounded-sm bg-primary-faint text-primary"><ShoppingCart className="h-7 w-7" /></span>
           <h2 className="mt-4 text-lg">{initial.length === 0 ? "No active carts" : "Nothing matches"}</h2>
           <p className="mt-1 text-sm">{initial.length === 0 ? "When a shopper adds something to their bag, it shows up here." : "Try a different filter, name or product."}</p>
         </div>
@@ -86,7 +86,7 @@ export function CartsAdmin({ initial }: { initial: AdminCart[] }) {
             const hrs = idleHours(c);
             const cu = c.customer; const a = cu.address;
             return (
-              <li key={c.userId} className="rounded-2xl border border-line bg-card p-4 shadow-card sm:p-5">
+              <li key={c.userId} className="rounded-sm border border-line bg-card p-4 shadow-card sm:p-5">
                 <div className="flex flex-wrap items-start justify-between gap-3">
                   <div className="min-w-0">
                     <p className="flex flex-wrap items-center gap-2 font-semibold text-ink"><UserRound className="h-4 w-4 text-primary" /> {cu.guest ? "Guest visitor" : cu.name}
@@ -102,14 +102,14 @@ export function CartsAdmin({ initial }: { initial: AdminCart[] }) {
                 </div>
 
                 {!cu.guest && (
-                  <dl className="mt-4 grid gap-x-6 gap-y-3 rounded-xl bg-surface p-3 text-sm sm:grid-cols-3">
+                  <dl className="mt-4 grid gap-x-6 gap-y-3 rounded-sm bg-surface p-3 text-sm sm:grid-cols-3">
                     <div><dt className="text-xs font-semibold">Purchase history</dt><dd className="mt-0.5 text-ink">{cu.orders ?? 0} order{cu.orders === 1 ? "" : "s"} · {formatPrice(cu.spent ?? 0)}{cu.lastOrderAt && <span className="block text-xs text-body">last order {timeAgo(cu.lastOrderAt)}</span>}</dd></div>
                     <div><dt className="flex items-center gap-1 text-xs font-semibold"><Wallet className="h-3 w-3" /> Wallet</dt><dd className="mt-0.5 text-ink">{formatPrice(cu.wallet ?? 0)}</dd></div>
                     <div><dt className="flex items-center gap-1 text-xs font-semibold"><MapPin className="h-3 w-3" /> Address</dt><dd className="mt-0.5 text-ink">{a ? [a.line1, a.city, a.state, a.pincode].filter(Boolean).join(", ") : <span className="text-body">Not saved yet</span>}</dd></div>
                   </dl>
                 )}
 
-                <ul className="mt-4 divide-y divide-line rounded-xl border border-line">
+                <ul className="mt-4 divide-y divide-line rounded-sm border border-line">
                   {c.items.map((i) => (
                     <li key={`${i.productId}|${i.size ?? ""}|${i.color ?? ""}`} className="flex items-center gap-3 p-3">
                       <ItemThumb item={i} />

@@ -42,14 +42,14 @@ function AnnouncementForm({ item, onSave, onCancel }: { item: Announcement | nul
       <Field label="Link (optional)" error={errors.href?.message} hint="Where the message goes when clicked, e.g. /shop">
         <Input placeholder="/shop" aria-invalid={!!errors.href} {...register("href")} />
       </Field>
-      <div className="flex items-center justify-between rounded-xl border border-line bg-surface p-4">
+      <div className="flex items-center justify-between rounded-sm border border-line bg-surface p-4">
         <p className="text-sm font-semibold text-ink">Show on the website</p>
         <Switch checked={active} onChange={setActive} label="Show message on website" />
       </div>
       {text.trim().length >= 3 && (
         <div>
           <p className="mb-1.5 text-xs">Preview</p>
-          <div className="overflow-hidden rounded-xl"><AnnouncementBar items={[{ id: "preview", text: text.trim(), active: true }]} /></div>
+          <div className="overflow-hidden rounded-sm"><AnnouncementBar items={[{ id: "preview", text: text.trim(), active: true }]} /></div>
         </div>
       )}
       <div className="flex justify-end gap-3 border-t border-line pt-5">
@@ -115,7 +115,7 @@ export function AnnouncementAdmin({ initial }: { initial: Announcement[] }) {
 
       <section aria-label="Live preview" className="mb-6">
         <p className="mb-2 text-sm font-medium text-ink">Live preview</p>
-        <div className="overflow-hidden rounded-2xl border border-line">
+        <div className="overflow-hidden rounded-sm border border-line">
           {live.length ? <AnnouncementBar items={live} /> : (
             <p className="bg-surface px-4 py-3 text-sm">No active messages, so the top bar is hidden on the website.</p>
           )}
@@ -123,8 +123,8 @@ export function AnnouncementAdmin({ initial }: { initial: Announcement[] }) {
       </section>
 
       {items.length === 0 ? (
-        <div className="flex flex-col items-center rounded-2xl border border-dashed border-line bg-card px-6 py-14 text-center">
-          <span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-primary-faint text-primary"><Megaphone className="h-7 w-7" /></span>
+        <div className="flex flex-col items-center rounded-sm border border-dashed border-line bg-card px-6 py-14 text-center">
+          <span className="flex h-14 w-14 items-center justify-center rounded-sm bg-primary-faint text-primary"><Megaphone className="h-7 w-7" /></span>
           <h2 className="mt-4 text-lg">No messages yet</h2>
           <p className="mt-1 text-sm">Add an offer or notice and it will scroll across the top of the website.</p>
           <Button className="mt-5" onClick={() => setEditing("new")}>Add message</Button>
@@ -132,7 +132,7 @@ export function AnnouncementAdmin({ initial }: { initial: Announcement[] }) {
       ) : (
         <ul className="grid gap-3">
           {items.map((a) => (
-            <li key={a.id} className={cn("flex flex-col gap-3 rounded-2xl border border-line bg-card p-4 shadow-card sm:flex-row sm:items-center", !a.active && "opacity-70")}>
+            <li key={a.id} className={cn("flex flex-col gap-3 rounded-sm border border-line bg-card p-4 shadow-card sm:flex-row sm:items-center", !a.active && "opacity-70")}>
               <div className="min-w-0 flex-1">
                 <p className="font-semibold text-ink">{a.text}</p>
                 {a.href && <p className="mt-0.5 flex items-center gap-1.5 text-xs"><Link2 className="h-3.5 w-3.5" /> {a.href}</p>}

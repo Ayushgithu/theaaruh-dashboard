@@ -1,7 +1,7 @@
 "use client";
 import * as React from "react";
 import Link from "next/link";
-import { ChevronDown, ExternalLink, LogOut, Settings } from "lucide-react";
+import { ChevronDown, ExternalLink, LogOut, Settings, User } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 /** Top-right "who is signed in" chip with a small account menu. */
@@ -20,7 +20,7 @@ export function AdminAccountMenu({ name, email, onLogout }: { name: string; emai
     return () => { document.removeEventListener("mousedown", click); document.removeEventListener("keydown", key); };
   }, [open]);
 
-  const avatar = "flex shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 font-bold text-white";
+  const avatar = "flex shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-primary-dark to-primary-light font-bold text-white";
   const item = "flex min-h-11 w-full items-center gap-3 rounded-lg px-3 text-left text-sm text-ink hover:bg-surface";
 
   return (
@@ -31,10 +31,10 @@ export function AdminAccountMenu({ name, email, onLogout }: { name: string; emai
         aria-haspopup="menu"
         aria-expanded={open}
         aria-label="Account menu"
-        className="flex h-11 items-center gap-2.5 rounded-xl border border-line bg-card py-1 pl-1.5 pr-1.5 transition hover:border-primary/40 hover:bg-primary-faint sm:pr-3"
+        className="flex h-11 items-center gap-2.5 rounded-sm border border-line bg-card py-1 pl-1.5 pr-1.5 transition hover:border-primary/40 hover:bg-primary-faint sm:pr-3"
       >
         <span className={cn(avatar, "relative h-8 w-8 text-sm")}>
-          {initial}
+          <User className="h-4 w-4" aria-hidden />
           <span className="absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full bg-emerald-500 ring-2 ring-card" aria-hidden />
         </span>
         <span className="hidden text-left leading-tight sm:block">
@@ -45,7 +45,7 @@ export function AdminAccountMenu({ name, email, onLogout }: { name: string; emai
       </button>
 
       {open && (
-        <div role="menu" className="absolute right-0 top-full z-50 mt-2 w-72 rounded-2xl border border-line bg-card p-2 shadow-lift">
+        <div role="menu" className="absolute right-0 top-full z-50 mt-2 w-72 rounded-sm border border-line bg-card p-2 shadow-lift">
           <div className="flex items-center gap-3 border-b border-line px-3 pb-3 pt-2">
             <span className={cn(avatar, "h-11 w-11 text-base")}>{initial}</span>
             <div className="min-w-0">

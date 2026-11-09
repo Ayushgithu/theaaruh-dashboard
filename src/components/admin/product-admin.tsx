@@ -75,8 +75,8 @@ export function ProductAdmin({ type, initial }: { type: ProductType; initial: Pr
       </div>
 
       {list.length === 0 ? (
-        <div className="flex flex-col items-center rounded-2xl border border-dashed border-line bg-card px-6 py-14 text-center">
-          <span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-primary-faint text-primary"><PackageSearch className="h-7 w-7" /></span>
+        <div className="flex flex-col items-center rounded-sm border border-dashed border-line bg-card px-6 py-14 text-center">
+          <span className="flex h-14 w-14 items-center justify-center rounded-sm bg-primary-faint text-primary"><PackageSearch className="h-7 w-7" /></span>
           <h2 className="mt-4 text-lg">{q ? "Nothing matches your search" : `No ${plural} yet`}</h2>
           <p className="mt-1 text-sm">{q ? "Try a different name or brand." : `Add your first ${noun} to see it here.`}</p>
           {q ? <Button variant="outline" className="mt-5" onClick={() => setQ("")}>Clear search</Button> : <Button className="mt-5" onClick={() => setEditing("new")}>Add {noun}</Button>}
@@ -84,7 +84,7 @@ export function ProductAdmin({ type, initial }: { type: ProductType; initial: Pr
       ) : (
         <>
           {/* Table on md+ */}
-          <div className="hidden overflow-x-auto rounded-2xl border border-line bg-card shadow-card md:block">
+          <div className="hidden overflow-x-auto rounded-sm border border-line bg-card shadow-card md:block">
             <table className="w-full min-w-[720px] text-sm">
               <thead className="bg-surface text-left text-xs font-semibold text-body">
                 <tr>
@@ -120,9 +120,9 @@ export function ProductAdmin({ type, initial }: { type: ProductType; initial: Pr
           {/* Stacked cards on small screens */}
           <ul className="grid gap-3 md:hidden">
             {list.map((p) => (
-              <li key={p.id} className="rounded-2xl border border-line bg-card p-3 shadow-card">
+              <li key={p.id} className="rounded-sm border border-line bg-card p-3 shadow-card">
                 <div className="flex gap-3">
-                  <div className="w-24 shrink-0 self-start overflow-hidden rounded-xl"><ProductVisual product={p} /></div>
+                  <div className="w-24 shrink-0 self-start overflow-hidden rounded-sm"><ProductVisual product={p} /></div>
                   <div className="min-w-0 flex-1">
                     <p className="font-semibold leading-snug text-ink">{p.name}</p>
                     <p className="mt-0.5 text-sm font-bold text-ink">{formatPrice(p.price)}</p>

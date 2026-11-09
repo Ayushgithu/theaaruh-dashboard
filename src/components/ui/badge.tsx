@@ -54,7 +54,7 @@ export function StatusBadge({ status }: { status: EnquiryStatus }) {
     closed: "bg-slate-100 text-slate-600 ring-slate-200",
   }[status];
   return (
-    <span className={cn("inline-flex rounded-full px-2.5 py-1 text-xs font-semibold capitalize ring-1 ring-inset", map)}>
+    <span className={cn("inline-flex rounded-md px-2.5 py-1 text-xs font-medium capitalize ring-1 ring-inset", map)}>
       {status}
     </span>
   );

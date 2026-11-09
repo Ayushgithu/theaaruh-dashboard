@@ -1,5 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { makeEnquiry, makeProduct } from "../fixtures";
 
 vi.mock("@/lib/repo", () => ({ getDashboard: vi.fn() }));
@@ -62,7 +63,9 @@ describe("Admin route protection (server side)", () => {
     vi.mocked(getSession).mockResolvedValue({ id: "a1", email: "owner@shop.com", name: "Store owner" });
     render(await PanelLayout({ children: <p>Admin content</p> }));
     expect(screen.getByText("Admin content")).toBeInTheDocument();
-    expect(screen.getByText("owner@shop.com")).toBeInTheDocument();
+    const user = userEvent.setup();
+    await user.click(screen.getByRole("button", { name: "Account menu" }));
+    expect(within(screen.getByRole("menu")).getByText("owner@shop.com")).toBeInTheDocument();
   });
 
   it("the old /admin/login URL sends visitors to /login", () => {

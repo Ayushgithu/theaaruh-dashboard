@@ -86,7 +86,7 @@ function SlideForm({ slide, onSave, onCancel }: { slide: Slide | null; onSave: (
         <PhotoUpload files={mFiles} onChange={(f) => setMFiles(f.slice(-1))} max={1} />
       </div>
 
-      <div className="flex items-center justify-between rounded-xl border border-line bg-surface p-4">
+      <div className="flex items-center justify-between rounded-sm border border-line bg-surface p-4">
         <p className="text-sm font-semibold text-ink">Show on the website</p>
         <Switch checked={active} onChange={setActive} label="Show slide on website" />
       </div>
@@ -168,8 +168,8 @@ export function SlideAdmin({ initial }: { initial: Slide[] }) {
         action={<Button onClick={() => setEditing("new")}><Plus className="h-4 w-4" /> Add slide</Button>}
       />
       {items.length === 0 ? (
-        <div className="flex flex-col items-center rounded-2xl border border-dashed border-line bg-card px-6 py-14 text-center">
-          <span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-primary-faint text-primary"><ImageOff className="h-7 w-7" /></span>
+        <div className="flex flex-col items-center rounded-sm border border-dashed border-line bg-card px-6 py-14 text-center">
+          <span className="flex h-14 w-14 items-center justify-center rounded-sm bg-primary-faint text-primary"><ImageOff className="h-7 w-7" /></span>
           <h2 className="mt-4 text-lg">No slides yet</h2>
           <p className="mt-1 text-sm">Add your first banner image to show the carousel on the home page.</p>
           <Button className="mt-5" onClick={() => setEditing("new")}>Add slide</Button>
@@ -177,9 +177,9 @@ export function SlideAdmin({ initial }: { initial: Slide[] }) {
       ) : (
         <ul className="grid gap-4">
           {items.map((s, idx) => (
-            <li key={s.id} className={cn("flex flex-col gap-4 rounded-2xl border border-line bg-card p-4 shadow-card lg:flex-row lg:items-center", !s.active && "opacity-75")}>
+            <li key={s.id} className={cn("flex flex-col gap-4 rounded-sm border border-line bg-card p-4 shadow-card lg:flex-row lg:items-center", !s.active && "opacity-75")}>
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={s.image} alt={s.title} className="aspect-[4/1] w-full shrink-0 rounded-xl border border-line object-cover lg:w-72" />
+              <img src={s.image} alt={s.title} className="aspect-[4/1] w-full shrink-0 rounded-sm border border-line object-cover lg:w-72" />
               <div className="min-w-0 flex-1">
                 <p className="font-semibold text-ink">{s.title}</p>
                 <p className="mt-0.5 truncate text-sm">{s.href ? `Links to ${s.href}` : "No link"}{s.mobileImage ? " · has mobile image" : ""}</p>

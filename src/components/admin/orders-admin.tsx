@@ -27,6 +27,8 @@ const ACTION_LABEL: Partial<Record<OrderStatus, string>> = { confirmed: "Confirm
 
 export function OrdersAdmin({ initial, shiprocket = false }: { initial: Order[]; shiprocket?: boolean }) {
   const [orders, setOrders] = React.useState(initial);
+  // Keep the editable list aligned with server data after router.refresh().
+  // eslint-disable-next-line react-hooks/set-state-in-effect
   React.useEffect(() => setOrders(initial), [initial]); // new orders arrive via router.refresh()
   const [tab, setTab] = React.useState<Tab>("all");
   const [q, setQ] = React.useState("");
@@ -80,7 +82,7 @@ export function OrdersAdmin({ initial, shiprocket = false }: { initial: Order[];
         action={toPack.length > 0 ? <Button asChild variant="outline"><a href={`/print/orders?ids=${toPack.slice(0, 60).map((o) => o.id).join(",")}`} target="_blank" rel="noopener noreferrer"><Printer className="h-4 w-4" /> Print slips for {Math.min(toPack.length, 60)} order{toPack.length === 1 ? "" : "s"} to pack</a></Button> : undefined} />
 
       <div className="mb-4 flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-        <div role="tablist" aria-label="Filter orders" className="no-scrollbar flex gap-1 overflow-x-auto rounded-xl bg-card p-1 shadow-card ring-1 ring-line">
+        <div role="tablist" aria-label="Filter orders" className="no-scrollbar flex gap-1 overflow-x-auto rounded-sm bg-card p-1 shadow-card ring-1 ring-line">
           {TABS.map((t) => (
             <button key={t.id} role="tab" aria-selected={tab === t.id} onClick={() => setTab(t.id)}
               className={cn("min-h-10 shrink-0 rounded-lg px-3.5 text-sm font-medium transition", tab === t.id ? "bg-primary text-white" : "text-body hover:bg-surface")}>
@@ -95,15 +97,15 @@ export function OrdersAdmin({ initial, shiprocket = false }: { initial: Order[];
       </div>
 
       {list.length === 0 ? (
-        <div className="flex flex-col items-center rounded-2xl border border-dashed border-line bg-card px-6 py-14 text-center">
-          <span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-primary-faint text-primary"><Package className="h-7 w-7" /></span>
+        <div className="flex flex-col items-center rounded-sm border border-dashed border-line bg-card px-6 py-14 text-center">
+          <span className="flex h-14 w-14 items-center justify-center rounded-sm bg-primary-faint text-primary"><Package className="h-7 w-7" /></span>
           <h2 className="mt-4 text-lg">{orders.length === 0 ? "No orders yet" : "No orders here"}</h2>
           <p className="mt-1 text-sm">{orders.length === 0 ? "Orders appear here as soon as customers buy." : "Nothing matches this filter."}</p>
           {orders.length > 0 && <Button variant="outline" className="mt-5" onClick={() => { setTab("all"); setQ(""); }}>Show all orders</Button>}
         </div>
       ) : (
         <>
-          <div className="hidden overflow-x-auto rounded-2xl border border-line bg-card shadow-card md:block">
+          <div className="hidden overflow-x-auto rounded-sm border border-line bg-card shadow-card md:block">
             <table className="w-full min-w-[820px] text-sm">
               <thead className="bg-surface text-left text-xs font-semibold text-body">
                 <tr><th className="px-4 py-3">Order</th><th className="px-4 py-3">Customer</th><th className="px-4 py-3">Items</th><th className="px-4 py-3">Total</th><th className="px-4 py-3">Payment</th><th className="px-4 py-3">Status</th><th className="px-4 py-3">Placed</th></tr>
@@ -126,7 +128,7 @@ export function OrdersAdmin({ initial, shiprocket = false }: { initial: Order[];
           <ul className="grid gap-3 md:hidden">
             {list.map((o) => (
               <li key={o.id}>
-                <button onClick={() => setOpenId(o.id)} className="w-full rounded-2xl border border-line bg-card p-4 text-left shadow-card">
+                <button onClick={() => setOpenId(o.id)} className="w-full rounded-sm border border-line bg-card p-4 text-left shadow-card">
                   <div className="flex items-start justify-between gap-3"><p className="font-semibold text-ink">{o.orderNumber}</p><OrderStatusBadge status={o.status} /></div>
                   <p className="mt-1 text-sm">{o.customer.name} · {formatPrice(o.total)}</p>
                   <p className="mt-1 line-clamp-1 text-xs">{o.items.map((i) => i.name).join(", ")}</p>
@@ -144,7 +146,7 @@ export function OrdersAdmin({ initial, shiprocket = false }: { initial: Order[];
             <div className="flex flex-wrap items-center gap-3"><OrderStatusBadge status={open.status} className="text-sm" /><PaymentBadge order={open} /></div>
 
             <div className="grid gap-4 sm:grid-cols-2">
-              <section className="rounded-xl border border-line p-4 text-sm">
+              <section className="rounded-sm border border-line p-4 text-sm">
                 <p className="text-xs font-semibold">Customer</p>
                 <p className="mt-1 font-semibold text-ink">{open.customer.name}</p>
                 <p>{open.customer.email}</p><p>{open.customer.phone}</p>
@@ -153,7 +155,7 @@ export function OrdersAdmin({ initial, shiprocket = false }: { initial: Order[];
                   <Button asChild variant="outline" size="sm"><a href={`tel:+${phone91(open.customer.phone)}`}><Phone className="h-4 w-4" /> Call</a></Button>
                 </div>
               </section>
-              <section className="rounded-xl border border-line p-4 text-sm">
+              <section className="rounded-sm border border-line p-4 text-sm">
                 <p className="flex items-center gap-1.5 text-xs font-semibold"><MapPin className="h-3.5 w-3.5" /> Ship to</p>
                 <address className="mt-1 not-italic leading-relaxed"><strong className="font-semibold text-ink">{open.address.name}</strong><br />{open.address.line1}{open.address.line2 ? `, ${open.address.line2}` : ""}<br />{open.address.city}, {open.address.state} {open.address.pincode}<br />{open.address.phone}</address>
               </section>
@@ -161,7 +163,7 @@ export function OrdersAdmin({ initial, shiprocket = false }: { initial: Order[];
 
             <section>
               <p className="mb-2 text-xs font-semibold">Items</p>
-              <ul className="divide-y divide-line rounded-xl border border-line">
+              <ul className="divide-y divide-line rounded-sm border border-line">
                 {open.items.map((i) => (
                   <li key={`${i.productId}|${i.size ?? ""}|${i.color ?? ""}`} className="flex items-center gap-3 p-3">
                     <ItemThumb item={i} />
@@ -182,7 +184,7 @@ export function OrdersAdmin({ initial, shiprocket = false }: { initial: Order[];
               <section>
                 <p className="mb-3 text-xs font-semibold">History</p><OrderTimeline order={open} />
                 {open.tracking && (
-                  <div className="mt-3 space-y-2 rounded-xl bg-primary-faint p-3 text-sm">
+                  <div className="mt-3 space-y-2 rounded-sm bg-primary-faint p-3 text-sm">
                     <p className="flex items-center gap-2"><Truck className="h-4 w-4 text-primary" /> {open.tracking.carrier} · <strong className="text-ink">{open.tracking.number}</strong></p>
                     <div className="flex flex-wrap gap-2">
                       {open.tracking.labelUrl && <Button asChild size="sm" variant="outline"><a href={open.tracking.labelUrl} target="_blank" rel="noopener noreferrer"><Tag className="h-4 w-4" /> Print label</a></Button>}
@@ -191,7 +193,7 @@ export function OrdersAdmin({ initial, shiprocket = false }: { initial: Order[];
                     {(open.trackingEvents?.length ?? 0) > 0 && <ul className="space-y-1 border-t border-line pt-2 text-xs">{[...open.trackingEvents!].reverse().slice(0, 6).map((e, i) => <li key={i}><strong className="text-ink">{e.status}</strong> · {new Date(e.at).toLocaleString("en-IN", { day: "numeric", month: "short", hour: "numeric", minute: "2-digit" })}{e.location ? ` · ${e.location}` : ""}</li>)}</ul>}
                   </div>
                 )}
-                {open.payment.method === "cod" && open.payment.advance && <p className="mt-3 rounded-xl bg-amber-50 px-3 py-2 text-xs text-amber-700">{open.payment.advance.status === "paid" ? `COD with ₹${open.payment.advance.amount} advance paid online — collect ${formatPrice(open.total - open.payment.advance.amount)} on delivery.` : open.payment.advance.status === "refunded" ? `Advance of ₹${open.payment.advance.amount} was refunded.` : `Waiting for the ₹${open.payment.advance.amount} advance.`}</p>}
+                {open.payment.method === "cod" && open.payment.advance && <p className="mt-3 rounded-sm bg-amber-50 px-3 py-2 text-xs text-amber-700">{open.payment.advance.status === "paid" ? `COD with ₹${open.payment.advance.amount} advance paid online — collect ${formatPrice(open.total - open.payment.advance.amount)} on delivery.` : open.payment.advance.status === "refunded" ? `Advance of ₹${open.payment.advance.amount} was refunded.` : `Waiting for the ₹${open.payment.advance.amount} advance.`}</p>}
               </section>
 
               <section aria-label="Update order" className="space-y-3">
@@ -201,7 +203,7 @@ export function OrdersAdmin({ initial, shiprocket = false }: { initial: Order[];
                 {nextStatuses(open.status).filter((s) => s !== "cancelled").map((s) =>
                   s === "shipped" ? (
                     shipping ? (
-                      <div key={s} className="space-y-2 rounded-xl border border-line p-3">
+                      <div key={s} className="space-y-2 rounded-sm border border-line p-3">
                         <Input placeholder="Courier (e.g. Delhivery)" value={carrier} onChange={(e) => setCarrier(e.target.value)} aria-label="Courier name" />
                         <Input placeholder="Tracking number" value={tracking} onChange={(e) => setTracking(e.target.value)} aria-label="Tracking number" />
                         <Input placeholder="Tracking link (optional)" value={trackUrl} onChange={(e) => setTrackUrl(e.target.value)} aria-label="Tracking link" />
@@ -221,7 +223,7 @@ export function OrdersAdmin({ initial, shiprocket = false }: { initial: Order[];
 
                 {nextStatuses(open.status).includes("cancelled") && (
                   cancelling ? (
-                    <div className="space-y-2 rounded-xl border border-red-200 bg-red-50 p-3">
+                    <div className="space-y-2 rounded-sm border border-red-200 bg-red-50 p-3">
                       <p className="text-sm font-medium text-red-700">{open.payment.status === "paid" && open.payment.method === "razorpay" ? `Cancel and refund ${formatPrice(open.total)} to the customer via Razorpay?` : "Cancel this order and put the items back in stock?"}</p>
                       <Textarea className="min-h-16 bg-card" placeholder="Reason (optional, shown in history)" value={note} onChange={(e) => setNote(e.target.value)} aria-label="Cancellation reason" />
                       <div className="flex gap-2"><Button variant="danger" className="flex-1" disabled={busy} onClick={() => update("cancelled", note ? { note } : {})}>{busy ? <Loader2 className="h-4 w-4 animate-spin" /> : "Yes, cancel order"}</Button><Button variant="ghost" onClick={() => setCancelling(false)}>Back</Button></div>

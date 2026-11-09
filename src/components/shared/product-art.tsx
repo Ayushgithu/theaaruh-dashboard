@@ -47,8 +47,8 @@ function ClothArt({ hue, view, className, title }: { hue: number; view: number; 
 }
 
 export function ProductArt({ kind, tone, hue, view = 0, className, title }: ArtProps) {
-  if (kind === "cloth") return <ClothArt hue={hue} view={view} className={className} title={title} />;
   const uid = React.useId().replace(/:/g, "");
+  if (kind === "cloth") return <ClothArt hue={hue} view={view} className={className} title={title} />;
   const t = T[tone];
   const isLaptop = kind === "laptop" || kind === "macbook" || kind === "gaming";
 

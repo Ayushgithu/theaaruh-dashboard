@@ -60,7 +60,7 @@ export function BulkUpload({ onDone }: { onDone?: () => void }) {
           <p className="text-sm">Add up to {BULK_MAX} products from an Excel or CSV file. Photos are added afterwards from each product. Sizes look like <code className="rounded bg-surface px-1">S:4,M:6,L:6</code> (size:pieces) and colours like <code className="rounded bg-surface px-1">Maroon:#8c1d40,Green</code>.</p>
           <div className="flex flex-wrap gap-2">
             <Button variant="soft" onClick={template}><Download className="h-4 w-4" /> Download template</Button>
-            <label className="inline-flex min-h-11 cursor-pointer items-center gap-2 rounded-xl border border-line bg-card px-4 text-sm font-semibold text-ink hover:border-primary">
+            <label className="inline-flex min-h-11 cursor-pointer items-center gap-2 rounded-sm border border-line bg-card px-4 text-sm font-semibold text-ink hover:border-primary">
               <FileSpreadsheet className="h-4 w-4 text-primary" /> {file || "Choose .xlsx or .csv file"}
               <input type="file" accept=".xlsx,.csv,.txt" className="sr-only" aria-label="Choose spreadsheet" onChange={(e) => { void pick(e.target.files?.[0]); e.target.value = ""; }} />
             </label>
@@ -69,7 +69,7 @@ export function BulkUpload({ onDone }: { onDone?: () => void }) {
           {checked.length > 0 && !result && (
             <>
               <p className="text-sm"><strong className="text-ink">{good}</strong> of {checked.length} rows are ready{checked.length - good > 0 && <> · <strong className="text-red-600">{checked.length - good}</strong> have problems (they will be skipped)</>}.</p>
-              <div className="max-h-72 overflow-auto rounded-xl border border-line">
+              <div className="max-h-72 overflow-auto rounded-sm border border-line">
                 <table className="w-full min-w-[32rem] text-left text-sm">
                   <thead className="sticky top-0 bg-surface text-xs"><tr><th className="px-3 py-2">Row</th><th className="px-3 py-2">Name</th><th className="px-3 py-2">Collection</th><th className="px-3 py-2">Price</th><th className="px-3 py-2">Check</th></tr></thead>
                   <tbody className="divide-y divide-line">
@@ -85,7 +85,7 @@ export function BulkUpload({ onDone }: { onDone?: () => void }) {
           )}
 
           {result && (
-            <div role="status" className="space-y-2 rounded-xl bg-surface p-4 text-sm">
+            <div role="status" className="space-y-2 rounded-sm bg-surface p-4 text-sm">
               <p className="font-semibold text-ink">{result.created} added{result.failed.length > 0 && `, ${result.failed.length} skipped`}.</p>
               {result.failed.map((f) => <p key={f.row} className="text-xs text-red-600">Row {f.row} {f.name && `(${f.name})`}: {f.error}</p>)}
               <Button onClick={() => setOpen(false)}>Done</Button>

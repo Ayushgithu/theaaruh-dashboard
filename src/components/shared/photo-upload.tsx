@@ -15,6 +15,8 @@ export function PhotoUpload({ files, onChange, max = 5, maxMb = 5 }: {
 
   React.useEffect(() => {
     const next = files.map((file) => ({ file, url: URL.createObjectURL(file) }));
+    // Object URLs must be created and revoked outside render.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setItems(next);
     return () => next.forEach((i) => URL.revokeObjectURL(i.url));
   }, [files]);

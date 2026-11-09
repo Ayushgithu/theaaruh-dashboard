@@ -11,6 +11,7 @@ import { postJson } from "@/lib/api";
 import { Button } from "@/components/ui/button";
 import { Field, Input } from "@/components/ui/form";
 import { LogoMark } from "@/components/ui/icons";
+import { brandName } from "@/lib/brand";
 
 export type AuthMode = "login" | "forgot" | "sent" | "reset";
 
@@ -34,6 +35,8 @@ export function AdminLoginScreen() {
   React.useEffect(() => {
     const q = new URLSearchParams(window.location.search);
     if (q.get("mode") === "reset" && q.get("token") && q.get("email")) {
+      // Parse browser-only reset parameters after hydration to avoid exposing them in server-rendered state.
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setReset({ token: q.get("token")!, email: q.get("email")! });
       setMode("reset");
     } else if (q.get("mode") === "forgot") setMode("forgot");
@@ -42,24 +45,33 @@ export function AdminLoginScreen() {
 
   return (
     <main className="flex min-h-dvh items-center justify-center bg-surface px-4 py-10">
-      <div className="w-full max-w-md rounded-2xl border border-line bg-card p-6 shadow-card sm:p-8">
-        <h1 className="mb-1 text-xl font-bold text-ink">{TITLES[mode]}</h1>
-        <div className="mb-5 mt-3 flex items-center gap-3">
-          <LogoMark className="h-10 w-10 shrink-0" />
-          <p className="text-sm">
-            {mode === "login" && "Sign in to manage products, banners and enquiries."}
+      <div className="w-full max-w-sm">
+        <div className="mb-6 flex items-center justify-center gap-3">
+          <LogoMark className="h-12 w-14 shrink-0" />
+          <span className="text-xl font-extrabold text-ink">{brandName}</span>
+        </div>
+        <div className="rounded-sm border border-line bg-card p-6 sm:p-8">
+          <h1 className="text-xl font-bold text-ink">{TITLES[mode]}</h1>
+          <p className="mb-5 mt-1 text-sm">
+            {mode === "login" && "Sign in to manage your store."}
             {mode === "forgot" && "Enter your admin email and we will send you a reset link."}
             {mode === "sent" && "If that email belongs to an admin, a reset link is on its way."}
             {mode === "reset" && `Setting a new password for ${reset?.email}.`}
           </p>
-        </div>
 
-        {mode === "login" && <LoginPanel onForgot={(e) => { setEmail(e); setMode("forgot"); }} onDone={() => {}} />}
-        {mode === "forgot" && <ForgotPanel initialEmail={email} onBack={() => setMode("login")} onSent={(e) => { setEmail(e); setMode("sent"); }} />}
-        {mode === "sent" && <SentPanel email={email} onBack={() => setMode("login")} onResend={() => setMode("forgot")} />}
-        {mode === "reset" && reset && (
-          <ResetPanel token={reset.token} email={reset.email} onDone={() => { toast.success("Password updated", { description: "Sign in with your new password." }); setMode("login"); }} />
-        )}
+          {mode === "login" && <LoginPanel onForgot={(e) => { setEmail(e); setMode("forgot"); }} onDone={() => {}} />}
+          {mode === "forgot" && <ForgotPanel initialEmail={email} onBack={() => setMode("login")} onSent={(e) => { setEmail(e); setMode("sent"); }} />}
+          {mode === "sent" && <SentPanel email={email} onBack={() => setMode("login")} onResend={() => setMode("forgot")} />}
+          {mode === "reset" && reset && (
+            <ResetPanel token={reset.token} email={reset.email} onDone={() => { toast.success("Password updated", { description: "Sign in with your new password." }); setMode("login"); }} />
+          )}
+        </div>
+        <p className="mt-6 text-center text-xs text-ink/50">
+          Created by{" "}
+          <a href="https://lexicalsoftware.in" target="_blank" rel="noopener noreferrer" className="font-semibold text-primary hover:underline">
+            Lexical Software
+          </a>
+        </p>
       </div>
     </main>
   );
@@ -89,7 +101,7 @@ function LoginPanel({ onForgot, onDone }: { onForgot: (email: string) => void; o
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} noValidate className="space-y-4">
-      {error && <p role="alert" className="rounded-xl bg-red-50 px-4 py-3 text-sm font-medium text-red-700">{error}</p>}
+      {error && <p role="alert" className="rounded-sm bg-red-50 px-4 py-3 text-sm font-medium text-red-700">{error}</p>}
       <Field label="Email" error={errors.email?.message}>
         <Input type="email" autoComplete="username" autoFocus aria-invalid={!!errors.email} {...register("email")} />
       </Field>
@@ -133,7 +145,7 @@ function ForgotPanel({ initialEmail, onBack, onSent }: { initialEmail: string; o
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} noValidate className="space-y-4">
-      {error && <p role="alert" className="rounded-xl bg-red-50 px-4 py-3 text-sm font-medium text-red-700">{error}</p>}
+      {error && <p role="alert" className="rounded-sm bg-red-50 px-4 py-3 text-sm font-medium text-red-700">{error}</p>}
       <Field label="Admin email" error={errors.email?.message}>
         <Input type="email" autoComplete="email" autoFocus aria-invalid={!!errors.email} {...register("email")} />
       </Field>
@@ -148,7 +160,7 @@ function ForgotPanel({ initialEmail, onBack, onSent }: { initialEmail: string; o
 function SentPanel({ email, onBack, onResend }: { email: string; onBack: () => void; onResend: () => void }) {
   return (
     <div className="text-center">
-      <span className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-700"><MailCheck className="h-7 w-7" /></span>
+      <span className="mx-auto flex h-14 w-14 items-center justify-center rounded-sm bg-emerald-50 text-emerald-700"><MailCheck className="h-7 w-7" /></span>
       <p className="mt-4 text-sm">
         We sent a reset link to <strong className="font-semibold text-ink">{email}</strong>. It is valid for 1 hour. Check your spam folder if you do not see it.
       </p>
@@ -178,7 +190,7 @@ function ResetPanel({ token, email, onDone }: { token: string; email: string; on
   return (
     <form onSubmit={handleSubmit(onSubmit)} noValidate className="space-y-4">
       {error && (
-        <p role="alert" className="rounded-xl bg-red-50 px-4 py-3 text-sm font-medium text-red-700">{error}</p>
+        <p role="alert" className="rounded-sm bg-red-50 px-4 py-3 text-sm font-medium text-red-700">{error}</p>
       )}
       <Field label="New password" hint="At least 8 characters" error={errors.password?.message}>
         <Input type="password" autoComplete="new-password" autoFocus aria-invalid={!!errors.password} {...register("password")} />

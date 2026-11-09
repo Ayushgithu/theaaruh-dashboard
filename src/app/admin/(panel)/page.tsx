@@ -3,6 +3,7 @@ import { Eye, IndianRupee, Inbox, Package, ShoppingBag, ShoppingCart, TrendingUp
 import { formatPrice } from "@/lib/utils";
 import { AdminPageHeader } from "@/components/admin/shell";
 import { StatusBadge } from "@/components/ui/badge";
+import { StatCard } from "@/components/ui/stat-card";
 import { AutoRefresh } from "@/components/admin/auto-refresh";
 import { getDashboard } from "@/lib/repo";
 
@@ -34,37 +35,23 @@ export default async function DashboardPage() {
 
       <div className="mb-4 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
         {shopStats.map(({ label, value, note, Icon, href }) => (
-          <Link key={label} href={href} className="rounded-2xl border border-line bg-card p-5 shadow-card transition hover:border-primary/40">
-            <div className="flex items-center justify-between">
-              <p className="text-sm font-medium">{label}</p>
-              <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary-faint text-primary"><Icon className="h-5 w-5" /></span>
-            </div>
-            <p className="mt-3 text-3xl font-extrabold tracking-tight text-ink">{value}</p>
-            <p className="mt-1 text-sm">{note}</p>
-          </Link>
+          <StatCard key={label} Icon={Icon} label={label} value={value} hint={note} href={href} />
         ))}
       </div>
       {d.shop.lowStock > 0 && (
-        <p className="mb-4 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm font-medium text-amber-700">
+        <p className="mb-4 rounded-sm border border-amber-200 bg-amber-50 px-4 py-3 text-sm font-medium text-amber-700">
           {d.shop.lowStock} product{d.shop.lowStock > 1 ? "s are" : " is"} running low (3 or fewer units left). <Link href="/admin/clothing" className="underline">Check stock</Link>
         </p>
       )}
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
         {stats.map(({ label, value, note, Icon, small }) => (
-          <div key={label} className="rounded-2xl border border-line bg-card p-5 shadow-card">
-            <div className="flex items-center justify-between">
-              <p className="text-sm font-medium">{label}</p>
-              <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary-faint text-primary"><Icon className="h-5 w-5" /></span>
-            </div>
-            <p className={small ? "mt-3 line-clamp-2 text-lg font-bold leading-snug text-ink" : "mt-3 text-3xl font-extrabold tracking-tight text-ink"}>{value}</p>
-            <p className="mt-1 text-sm">{note}</p>
-          </div>
+          <StatCard key={label} Icon={Icon} label={label} value={value} hint={note} small={small} />
         ))}
       </div>
 
       <div className="mt-6 grid gap-4 xl:grid-cols-[1.2fr_1fr]">
-        <section className="rounded-2xl border border-line bg-card p-5 shadow-card">
+        <section className="rounded-sm border border-line bg-card p-5 shadow-card">
           <div className="flex items-center justify-between">
             <h2 className="text-base font-semibold">Recent enquiries</h2>
             <Link href="/admin/enquiries" className="text-sm font-medium text-primary hover:underline">View all</Link>
@@ -87,7 +74,7 @@ export default async function DashboardPage() {
         </section>
 
         <div className="grid gap-4">
-          <section className="rounded-2xl border border-line bg-card p-5 shadow-card">
+          <section className="rounded-sm border border-line bg-card p-5 shadow-card">
             <h2 className="text-base font-semibold">Enquiries per week</h2>
             <div className="mt-5 flex h-32 items-end gap-2" role="img" aria-label={`Enquiries over the last 7 weeks: ${d.weekly.join(", ")}`}>
               {d.weekly.map((v, i) => (
@@ -99,7 +86,7 @@ export default async function DashboardPage() {
             </div>
           </section>
 
-          <section className="rounded-2xl border border-line bg-card p-5 shadow-card">
+          <section className="rounded-sm border border-line bg-card p-5 shadow-card">
             <h2 className="text-base font-semibold">Top viewed</h2>
             {d.top.length === 0 ? (
               <p className="py-4 text-sm">Add products to see them here.</p>

@@ -16,7 +16,7 @@ export default async function InsightsPage({ searchParams }: { searchParams: Pro
   return (
     <>
       <AdminPageHeader title="Insights" description="What is selling, which sizes to stitch more of, and why things come back."
-        action={<div role="tablist" aria-label="Period" className="flex gap-1 rounded-xl bg-card p-1 shadow-card ring-1 ring-line">{RANGES.map((r) => <Link key={r} role="tab" aria-selected={r === days} href={`/admin/insights?days=${r}`} className={cn("min-h-10 rounded-lg px-3.5 py-2.5 text-sm font-medium", r === days ? "bg-primary text-white" : "text-body hover:bg-surface")}>Last {r} days</Link>)}</div>} />
+        action={<div role="tablist" aria-label="Period" className="flex gap-1 rounded-sm bg-card p-1 shadow-card ring-1 ring-line">{RANGES.map((r) => <Link key={r} role="tab" aria-selected={r === days} href={`/admin/insights?days=${r}`} className={cn("min-h-10 rounded-lg px-3.5 py-2.5 text-sm font-medium", r === days ? "bg-primary text-white" : "text-body hover:bg-surface")}>Last {r} days</Link>)}</div>} />
       <InsightsView data={data} />
     </>
   );

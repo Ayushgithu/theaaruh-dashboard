@@ -31,8 +31,17 @@ export function NotificationBell() {
   const known = React.useRef<Set<string> | null>(null); // null until the first answer, so old items don't toast on page load
   const ref = React.useRef<HTMLDivElement>(null);
 
-  React.useEffect(() => { setDismissed(readDismissed()); }, []);
-  React.useEffect(() => { setSeen(readSeen() ?? Date.now()); if (readSeen() === null) writeSeen(Date.now()); }, []);
+  React.useEffect(() => {
+    // Restore browser-only preferences after hydration.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setDismissed(readDismissed());
+  }, []);
+  React.useEffect(() => {
+    // Restore the browser-only read timestamp after hydration.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setSeen(readSeen() ?? Date.now());
+    if (readSeen() === null) writeSeen(Date.now());
+  }, []);
 
   const poll = React.useCallback(async () => {
     if (document.visibilityState !== "visible") return;
@@ -51,10 +60,14 @@ export function NotificationBell() {
   }, [router]);
 
   React.useEffect(() => {
-    void poll();
+    const initialPoll = window.setTimeout(() => { void poll(); }, 0);
     const id = window.setInterval(poll, POLL_MS);
     document.addEventListener("visibilitychange", poll);
-    return () => { window.clearInterval(id); document.removeEventListener("visibilitychange", poll); };
+    return () => {
+      window.clearTimeout(initialPoll);
+      window.clearInterval(id);
+      document.removeEventListener("visibilitychange", poll);
+    };
   }, [poll]);
 
   const markRead = React.useCallback(() => { const t = Date.now(); writeSeen(t); setSeen(t); }, []);
@@ -85,7 +98,7 @@ export function NotificationBell() {
         aria-haspopup="dialog"
         aria-expanded={open}
         aria-label={unread ? `Notifications, ${unread} new` : "Notifications"}
-        className="relative flex h-11 w-11 items-center justify-center rounded-xl text-body transition hover:bg-primary-faint hover:text-primary"
+        className="relative flex h-11 w-11 items-center justify-center rounded-sm text-body transition hover:bg-primary-faint hover:text-primary"
       >
         <Bell className="h-5 w-5" />
         {unread > 0 && (
@@ -94,7 +107,7 @@ export function NotificationBell() {
       </button>
 
       {open && (
-        <div role="dialog" aria-label="Notifications" className="fixed inset-x-3 top-16 z-50 overflow-hidden rounded-2xl border border-line bg-card shadow-lift sm:absolute sm:inset-x-auto sm:right-0 sm:top-full sm:mt-2 sm:w-96">
+        <div role="dialog" aria-label="Notifications" className="fixed inset-x-3 top-16 z-50 overflow-hidden rounded-sm border border-line bg-card shadow-lift sm:absolute sm:inset-x-auto sm:right-0 sm:top-full sm:mt-2 sm:w-96">
           <div className="flex items-center justify-between border-b border-line px-4 py-3">
             <h2 className="text-sm font-semibold">Notifications</h2>
             <button type="button" onClick={clearAll} disabled={visible.length === 0} className="inline-flex items-center gap-1.5 text-xs font-medium text-primary disabled:opacity-40">
@@ -113,7 +126,7 @@ export function NotificationBell() {
                 return (
                   <motion.li key={n.id} layout="position" exit={{ opacity: 0, x: 24, height: 0 }} transition={{ duration: 0.22 }} className="overflow-hidden">
                     <Link href={n.href} onClick={() => { setOpen(false); markRead(); }} className={cn("flex gap-3 px-4 py-3 transition hover:bg-surface", isNew && "bg-primary-faint/40")}>
-                      <span className={cn("flex h-9 w-9 shrink-0 items-center justify-center rounded-xl", TINT[n.kind])}><Icon className="h-4 w-4" /></span>
+                      <span className={cn("flex h-9 w-9 shrink-0 items-center justify-center rounded-sm", TINT[n.kind])}><Icon className="h-4 w-4" /></span>
                       <span className="min-w-0 flex-1">
                         <span className="flex items-center gap-2"><span className="truncate text-sm font-semibold text-ink">{n.title}</span>{isNew && <span className="h-2 w-2 shrink-0 rounded-full bg-red-500" aria-label="New" />}</span>
                         <span className="block truncate text-sm">{n.body}</span>

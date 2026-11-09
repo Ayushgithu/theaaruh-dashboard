@@ -30,7 +30,7 @@ export function AnnouncementBar({ items }: { items: Announcement[] }) {
   );
 
   return (
-    <div className="group relative z-[51] bg-primary text-sm font-medium text-white dark:bg-[#1d4ed8]" role="region" aria-label="Announcements">
+    <div className="group relative z-[51] bg-primary text-sm font-medium text-white dark:bg-primary-dark" role="region" aria-label="Announcements">
       <div className="container-x flex h-9 items-center gap-3">
         <Megaphone className="hidden h-4 w-4 shrink-0 opacity-90 sm:block" aria-hidden />
         <div className="relative min-w-0 flex-1 overflow-hidden motion-reduce:overflow-x-auto [mask-image:linear-gradient(90deg,transparent,#000_4%,#000_96%,transparent)]">

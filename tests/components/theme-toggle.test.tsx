@@ -8,6 +8,7 @@ const html = document.documentElement;
 
 beforeEach(() => {
   html.classList.remove("dark");
+  html.removeAttribute("data-accent");
   html.style.colorScheme = "";
   localStorage.clear();
   document.head.innerHTML = '<meta name="theme-color" content="#2563EB">';
@@ -27,7 +28,7 @@ describe("<ThemeToggle />", () => {
     expect(html).toHaveClass("dark");
     expect(html.style.colorScheme).toBe("dark");
     expect(localStorage.getItem(THEME_KEY)).toBe("dark");
-    expect(document.querySelector('meta[name="theme-color"]')).toHaveAttribute("content", "#0B1220");
+    expect(document.querySelector('meta[name="theme-color"]')).toHaveAttribute("content", "#000000");
     expect(screen.getByRole("button", { name: "Toggle dark mode" })).toHaveAttribute("aria-pressed", "true");
   });
 
@@ -39,7 +40,7 @@ describe("<ThemeToggle />", () => {
     await user.click(btn);
     expect(html).not.toHaveClass("dark");
     expect(localStorage.getItem(THEME_KEY)).toBe("light");
-    expect(document.querySelector('meta[name="theme-color"]')).toHaveAttribute("content", "#2563EB");
+    expect(document.querySelector('meta[name="theme-color"]')).toHaveAttribute("content", "#15803d");
   });
 
   it("two toggles (site header + dashboard) stay in sync", async () => {

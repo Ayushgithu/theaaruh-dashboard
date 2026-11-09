@@ -63,7 +63,7 @@ export function ReturnsAdmin({ initial, shiprocket, online, wallet = { bonus: 0 
       <AdminPageHeader title="Returns & exchanges" description="Requests from customers. Approve, arrange the pickup, receive the item, then refund or ship the replacement." />
 
       <div className="mb-4 flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-        <div role="tablist" aria-label="Filter requests" className="no-scrollbar flex gap-1 overflow-x-auto rounded-xl bg-card p-1 shadow-card ring-1 ring-line">
+        <div role="tablist" aria-label="Filter requests" className="no-scrollbar flex gap-1 overflow-x-auto rounded-sm bg-card p-1 shadow-card ring-1 ring-line">
           {TABS.map((t) => (
             <button key={t.id} role="tab" aria-selected={tab === t.id} onClick={() => setTab(t.id)} className={cn("min-h-10 shrink-0 rounded-lg px-3.5 text-sm font-medium transition", tab === t.id ? "bg-primary text-white" : "text-body hover:bg-surface")}>
               {t.label} <span className={cn("ml-1 text-xs", tab === t.id ? "text-white/80" : "text-slate-500")}>{count(t.id)}</span>
@@ -74,8 +74,8 @@ export function ReturnsAdmin({ initial, shiprocket, online, wallet = { bonus: 0 
       </div>
 
       {shown.length === 0 ? (
-        <div className="flex flex-col items-center rounded-2xl border border-dashed border-line bg-card px-6 py-14 text-center">
-          <span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-primary-faint text-primary"><Undo2 className="h-7 w-7" /></span>
+        <div className="flex flex-col items-center rounded-sm border border-dashed border-line bg-card px-6 py-14 text-center">
+          <span className="flex h-14 w-14 items-center justify-center rounded-sm bg-primary-faint text-primary"><Undo2 className="h-7 w-7" /></span>
           <h2 className="mt-4 text-lg">{q ? "Nothing matches your search" : "No requests here"}</h2>
           <p className="mt-1 text-sm">{q ? "Try a different request or order number." : "Return and exchange requests from customers will show up here."}</p>
         </div>
@@ -83,7 +83,7 @@ export function ReturnsAdmin({ initial, shiprocket, online, wallet = { bonus: 0 
         <ul className="space-y-3" aria-label="Return requests">
           {shown.map((r) => (
             <li key={r.id}>
-              <button type="button" onClick={() => show(r)} className="flex w-full flex-wrap items-center gap-3 rounded-2xl border border-line bg-card p-4 text-left shadow-card transition hover:border-primary/40">
+              <button type="button" onClick={() => show(r)} className="flex w-full flex-wrap items-center gap-3 rounded-sm border border-line bg-card p-4 text-left shadow-card transition hover:border-primary/40">
                 <ItemThumb item={r.items[0]} className="h-16 w-12" />
                 <div className="min-w-0 flex-1">
                   <p className="font-semibold text-ink">{r.number} <span className="font-normal">· {r.type === "exchange" ? "Exchange" : "Return"} · order {r.orderNumber}</span></p>
@@ -103,7 +103,7 @@ export function ReturnsAdmin({ initial, shiprocket, online, wallet = { bonus: 0 
             <div className="flex flex-wrap items-center justify-between gap-3"><Badge s={open.status} /><Link href="/admin/orders" className="text-sm font-semibold text-primary hover:underline">Order {open.orderNumber}</Link></div>
 
             <section>
-              <ul className="divide-y divide-line rounded-xl border border-line">
+              <ul className="divide-y divide-line rounded-sm border border-line">
                 {open.items.map((i) => (
                   <li key={i.index} className="flex items-center gap-3 p-3">
                     <ItemThumb item={i} className="h-16 w-12" />
@@ -117,17 +117,17 @@ export function ReturnsAdmin({ initial, shiprocket, online, wallet = { bonus: 0 
 
             <section className="grid gap-4 sm:grid-cols-2">
               <div><p className="text-xs font-semibold">Customer</p><p className="mt-1 text-sm"><strong className="text-ink">{open.customer.name}</strong><br />{open.customer.phone}<br />{open.customer.email.endsWith("@guest.invalid") ? "Guest (no email)" : open.customer.email}</p></div>
-              {open.type === "return" && <div className="sm:col-span-2 rounded-xl bg-amber-50 p-3 text-sm text-amber-800"><p className="font-semibold">Customer wants the refund {open.refundTo === "wallet" ? "in the store wallet" : "to the original payment / bank"}</p>{open.refundDetails && <p className="mt-1 break-words">Details: <strong>{open.refundDetails}</strong></p>}</div>}
+              {open.type === "return" && <div className="sm:col-span-2 rounded-sm bg-amber-50 p-3 text-sm text-amber-800"><p className="font-semibold">Customer wants the refund {open.refundTo === "wallet" ? "in the store wallet" : "to the original payment / bank"}</p>{open.refundDetails && <p className="mt-1 break-words">Details: <strong>{open.refundDetails}</strong></p>}</div>}
               <div><p className="text-xs font-semibold">Reason</p><p className="mt-1 text-sm"><strong className="text-ink">{open.reason}</strong>{open.comment ? <><br />“{open.comment}”</> : null}</p></div>
             </section>
 
             {open.photos.length > 0 && (
               <section><p className="mb-2 text-xs font-semibold">Customer photos</p>
-                <ul className="flex flex-wrap gap-2">{open.photos.map((u) => <li key={u}><a href={u} target="_blank" rel="noopener noreferrer">{/* eslint-disable-next-line @next/next/no-img-element */}<img src={u} alt="Customer photo" className="h-24 w-24 rounded-xl border border-line object-cover" /></a></li>)}</ul></section>
+                <ul className="flex flex-wrap gap-2">{open.photos.map((u) => <li key={u}><a href={u} target="_blank" rel="noopener noreferrer">{/* eslint-disable-next-line @next/next/no-img-element */}<img src={u} alt="Customer photo" className="h-24 w-24 rounded-sm border border-line object-cover" /></a></li>)}</ul></section>
             )}
 
             {(open.pickup?.awb || open.exchangeShipment?.awb || open.refund) && (
-              <section className="space-y-1 rounded-xl bg-primary-faint p-4 text-sm">
+              <section className="space-y-1 rounded-sm bg-primary-faint p-4 text-sm">
                 {open.pickup?.awb && <p><Truck className="mr-1.5 inline h-4 w-4 text-primary" />Pickup: {open.pickup.carrier} · <strong className="text-ink">{open.pickup.awb}</strong>{open.pickup.url && <> · <a href={open.pickup.url} target="_blank" rel="noopener noreferrer" className="font-semibold text-primary hover:underline">Track</a></>}</p>}
                 {open.exchangeShipment?.awb && <p><Truck className="mr-1.5 inline h-4 w-4 text-primary" />Replacement: {open.exchangeShipment.carrier} · <strong className="text-ink">{open.exchangeShipment.awb}</strong></p>}
                 {open.refund && <p><PackageCheck className="mr-1.5 inline h-4 w-4 text-primary" />Refunded <strong className="text-ink">{formatPrice(open.refund.amount)}</strong> {open.refund.method === "razorpay" ? `via Razorpay (${open.refund.refundId})` : open.refund.method === "wallet" ? `to the wallet${open.refund.bonus ? ` (+${formatPrice(open.refund.bonus)} bonus)` : ""}` : "manually"}{open.refund.note ? ` — ${open.refund.note}` : ""}</p>}
@@ -138,7 +138,7 @@ export function ReturnsAdmin({ initial, shiprocket, online, wallet = { bonus: 0 
               <p className="text-xs font-semibold">What would you like to do?</p>
 
               {open.status === "requested" && (rejecting ? (
-                <div className="space-y-2 rounded-xl border border-red-200 bg-red-50 p-3">
+                <div className="space-y-2 rounded-sm border border-red-200 bg-red-50 p-3">
                   <Textarea className="min-h-16 bg-card" placeholder="Reason shown to the customer" value={note} onChange={(e) => setNote(e.target.value)} aria-label="Rejection reason" />
                   <div className="flex gap-2"><Button variant="danger" className="flex-1" disabled={busy} onClick={() => run({ action: "reject", note }, "Request rejected")}>Reject request</Button><Button variant="ghost" onClick={() => setRejecting(false)}>Back</Button></div>
                 </div>
@@ -147,7 +147,7 @@ export function ReturnsAdmin({ initial, shiprocket, online, wallet = { bonus: 0 
               ))}
 
               {open.status === "approved" && (
-                <div className="space-y-3 rounded-xl border border-line p-3">
+                <div className="space-y-3 rounded-sm border border-line p-3">
                   <p className="text-sm font-medium text-ink">Arrange the pickup from the customer</p>
                   <Button variant="soft" disabled={busy || !shiprocket} onClick={() => run({ action: "shiprocket_pickup" }, "Reverse pickup booked")}><Truck className="h-4 w-4" /> Book pickup with Shiprocket</Button>
                   {!shiprocket && <p className="text-xs">Shiprocket is not set up — add the SHIPROCKET_* environment variables, or enter the pickup details manually below.</p>}
@@ -156,7 +156,7 @@ export function ReturnsAdmin({ initial, shiprocket, online, wallet = { bonus: 0 
               )}
 
               {["approved", "pickup_scheduled"].includes(open.status) && (
-                <div className="space-y-2 rounded-xl border border-line p-3">
+                <div className="space-y-2 rounded-sm border border-line p-3">
                   <p className="text-sm font-medium text-ink">Item reached you?</p>
                   <label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={restock} onChange={(e) => setRestock(e.target.checked)} className="h-4 w-4 accent-primary" /> Put it back in stock (untick if damaged)</label>
                   <Button variant="outline" disabled={busy} onClick={() => run({ action: "received", restock }, "Marked as received")}>Mark as received</Button>
@@ -164,7 +164,7 @@ export function ReturnsAdmin({ initial, shiprocket, online, wallet = { bonus: 0 
               )}
 
               {open.type === "return" && ["approved", "pickup_scheduled", "received"].includes(open.status) && (
-                <div className="space-y-3 rounded-xl border border-line p-3">
+                <div className="space-y-3 rounded-sm border border-line p-3">
                   <p className="text-sm font-medium text-ink">Refund</p>
                   <div className="grid gap-3 sm:grid-cols-2">
                     <Field label="Amount (₹)" hint={`Items value ${formatPrice(value(open))}. Delivery charges are usually not refunded.`}><Input inputMode="numeric" value={amount} onChange={(e) => setAmount(e.target.value.replace(/\D/g, ""))} aria-label="Refund amount" /></Field>
@@ -176,7 +176,7 @@ export function ReturnsAdmin({ initial, shiprocket, online, wallet = { bonus: 0 
               )}
 
               {open.type === "exchange" && ["approved", "pickup_scheduled", "received"].includes(open.status) && (
-                <div className="space-y-2 rounded-xl border border-line p-3">
+                <div className="space-y-2 rounded-sm border border-line p-3">
                   <p className="text-sm font-medium text-ink">Send the replacement{open.exchangeTo?.size ? ` (size ${open.exchangeTo.size})` : ""}</p>
                   <p className="text-xs">The replacement size is taken out of stock when you mark it shipped.</p>
                   <div className="grid gap-2 sm:grid-cols-[1fr_1fr_auto]"><Input placeholder="Courier" value={carrier} onChange={(e) => setCarrier(e.target.value)} aria-label="Replacement courier" /><Input placeholder="Tracking / AWB (optional)" value={awb} onChange={(e) => setAwb(e.target.value)} aria-label="Replacement tracking number" /><Button disabled={busy} onClick={() => run({ action: "exchange_ship", carrier, awb }, "Replacement marked as shipped")}>Mark shipped</Button></div>
