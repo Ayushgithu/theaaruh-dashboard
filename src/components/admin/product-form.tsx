@@ -28,6 +28,7 @@ const schema = z.object({
 type Values = z.infer<typeof schema>;
 
 const SIZE_PRESETS = ["XS", "S", "M", "L", "XL", "XXL", "XXXL", "Free Size"];
+const KIDS_PRESETS = ["0-6M", "6-12M", "1-2Y", "2-3Y", "3-4Y", "4-5Y", "5-6Y", "6-7Y", "7-8Y", "8-9Y", "9-10Y", "10-12Y", "12-14Y"];
 const BADGES = ["New", "Best Seller", "Trending", "Deal"];
 const COLLECTIONS = ["Suit Sets", "Sarees", "Co-ord Sets", "Dresses", "Kurtis", "Lehengas"];
 const ACCESSORY_CATEGORIES = ["Dupattas", "Jewellery", "Bags", "Footwear"];
@@ -52,6 +53,12 @@ export function ProductForm({ type, product, categories = [], onSave, onCancel }
   const [videoUrl, setVideoUrl] = React.useState(product?.videoUrl ?? "");
   const [returnable, setReturnable] = React.useState(product?.returnable !== false);
   const [exchangeable, setExchangeable] = React.useState(product?.exchangeable !== false);
+  const [guides, setGuides] = React.useState<{ name: string; slug: string; active: boolean }[]>([]);
+  const [guideSlugs, setGuideSlugs] = React.useState<string[]>(product?.sizeGuides ?? []);
+  React.useEffect(() => {
+    if (!clothing) return;
+    fetch("/api/admin/size-guides").then((r) => (r.ok ? r.json() : null)).then((j) => { if (j?.guides) setGuides(j.guides); }).catch(() => {});
+  }, [clothing]);
   const [specs, setSpecs] = React.useState<{ k: string; v: string }[]>(product ? Object.entries(product.specs).map(([k, v]) => ({ k, v })) : []);
   const [existing, setExisting] = React.useState<string[]>(product?.images ?? []);
   const [files, setFiles] = React.useState<File[]>([]);
@@ -109,6 +116,7 @@ export function ProductForm({ type, product, categories = [], onSave, onCancel }
         price: Number(v.price), mrp: v.mrp ? Number(v.mrp) : undefined,
         condition: "New", units: clothing && sizes.length ? undefined : Number(v.units || 0), featured, tags: [], badges,
         sizes: clothing ? sizes.map((s) => ({ label: s.label, qty: Number(s.qty) || 0 })) : [],
+        sizeGuides: clothing ? guideSlugs : [],
         colors: colorPayload, videoUrl: videoUrl.trim(), returnable, exchangeable, flashPrice: flashOn ? Number(flashPrice) : undefined, flashEndsAt: flashOn ? new Date(flashEnds).toISOString() : undefined,
         fabric: v.fabric?.trim() ?? "", fit: v.fit?.trim() ?? "", occasion: v.occasion?.trim() ?? "", washCare: v.washCare?.trim() ?? "",
         specs: Object.fromEntries(specs.filter((s) => s.k.trim() && s.v.trim()).map((s) => [s.k.trim(), s.v.trim()])),
@@ -149,6 +157,16 @@ export function ProductForm({ type, product, categories = [], onSave, onCancel }
               <button key={s.label} type="button" aria-pressed onClick={() => toggleSize(s.label)} className="rounded-full border border-primary bg-primary px-3.5 py-1.5 text-sm font-semibold text-white">{s.label} ×</button>
             ))}
           </div>
+          {guideSlugs.includes("kids") && (
+            <div className="mt-3">
+              <p className="mb-1.5 text-xs font-medium text-ink">Kids sizes (by age)</p>
+              <div className="flex flex-wrap gap-2">
+                {KIDS_PRESETS.filter((k) => !sizes.some((x) => x.label === k)).map((k) => (
+                  <button key={k} type="button" aria-pressed={false} onClick={() => toggleSize(k)} className="rounded-full border border-line bg-card px-3.5 py-1.5 text-sm font-semibold text-ink hover:border-primary">{k}</button>
+                ))}
+              </div>
+            </div>
+          )}
           <div className="mt-3 flex gap-2">
             <Input aria-label="Custom size" placeholder="Custom size, e.g. 38" value={customSize} onChange={(e) => setCustomSize(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); addCustom(); } }} className="max-w-48" />
             <Button type="button" variant="soft" size="sm" onClick={addCustom}><Plus className="h-4 w-4" /> Add size</Button>
@@ -164,6 +182,23 @@ export function ProductForm({ type, product, categories = [], onSave, onCancel }
               <p className="col-span-full text-xs">Total in stock: <strong className="text-ink">{totalUnits}</strong>{totalUnits > 0 && totalUnits <= 3 ? " (shows as low stock)" : ""}</p>
             </div>
           )}
+        </div>
+      )}
+
+      {clothing && guides.length > 0 && (
+        <div className="rounded-sm border border-line p-4">
+          <p className="text-sm font-semibold text-ink">Size guide for this product</p>
+          <p className="mb-3 text-xs">Tick the chart(s) customers should see: Women for women&apos;s wear, Kids for children&apos;s wear, or both for twinning sets. If you tick none, all charts are shown.</p>
+          <div className="flex flex-wrap gap-2">
+            {guides.map((g) => {
+              const on = guideSlugs.includes(g.slug);
+              return (
+                <button key={g.slug} type="button" aria-pressed={on} onClick={() => setGuideSlugs((cur) => (cur.includes(g.slug) ? cur.filter((x) => x !== g.slug) : [...cur, g.slug]))} className={on ? "rounded-full border border-primary bg-primary px-3.5 py-1.5 text-sm font-semibold text-white" : "rounded-full border border-line bg-card px-3.5 py-1.5 text-sm font-semibold text-ink hover:border-primary"}>
+                  {on ? "✓ " : ""}{g.name}{g.active ? "" : " (hidden)"}
+                </button>
+              );
+            })}
+          </div>
         </div>
       )}
 

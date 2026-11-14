@@ -72,6 +72,7 @@ export const productInput = z.object({
   colors: z.array(colorRow).max(12).default([]),
   fabric: z.string().trim().max(120).default(""),
   washCare: z.string().trim().max(400).default(""),
+  sizeGuides: z.array(z.string().trim().max(60)).max(8).default([]),
   fit: z.string().trim().max(60).default(""),
   occasion: z.string().trim().max(60).default(""),
   badges: z.array(z.string().trim().max(24)).max(5).default([]),

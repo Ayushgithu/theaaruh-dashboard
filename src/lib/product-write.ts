@@ -21,6 +21,7 @@ export function fieldsFromInput(v: ProductInput) {
     colors: v.colors,
     fabric: v.fabric,
     washCare: v.washCare,
+    sizeGuides: v.sizeGuides,
     fit: v.fit,
     occasion: v.occasion,
     badges: v.badges,
