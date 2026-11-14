@@ -217,6 +217,7 @@ export const storeRulesSchema = z.object({
   }),
   shipment: z.object({ weightKg: z.coerce.number().min(0.05).max(30), lengthCm: z.coerce.number().min(1).max(200), breadthCm: z.coerce.number().min(1).max(200), heightCm: z.coerce.number().min(0.5).max(200) }),
   wallet: z.object({ enabled: z.boolean(), bonusPercent: z.coerce.number().min(0).max(30) }),
+  homeSections: z.object({ bestSellers: z.boolean(), shopBy: z.boolean(), newArrivals: z.boolean(), lookbook: z.boolean() }).default({ bestSellers: true, shopBy: true, newArrivals: true, lookbook: true }),
   delivery: z.object({
     handlingDays: z.coerce.number().int().min(0).max(10), cutoffHour: z.coerce.number().int().min(0).max(23),
     transitMin: z.coerce.number().int().min(0).max(30), transitMax: z.coerce.number().int().min(0).max(30), sundayOff: z.boolean(),

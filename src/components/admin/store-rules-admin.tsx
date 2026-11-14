@@ -49,6 +49,13 @@ export function StoreRulesAdmin({ initial }: { initial: StoreRules }) {
       <AdminPageHeader title="Store rules" description="Delivery, payments, returns, size chart and sale countdown — change them here and the website follows." />
 
       <div className="space-y-6 pb-24">
+        <Card title="Home page sections" hint="Switch a whole section off to hide it from the home page. Turn it back on any time. Remember to press Save.">
+          <Row title="Best sellers" text="“Loved by many” product row"><Switch checked={r.homeSections.bestSellers} onChange={(v) => set("homeSections", { bestSellers: v })} label="Show Best sellers" /></Row>
+          <Row title="Shop by budget, occasion & colour" text="The quick-filter chips section"><Switch checked={r.homeSections.shopBy} onChange={(v) => set("homeSections", { shopBy: v })} label="Show Shop by budget, occasion and colour" /></Row>
+          <Row title="New arrivals" text="“Just landed” product row"><Switch checked={r.homeSections.newArrivals} onChange={(v) => set("homeSections", { newArrivals: v })} label="Show New arrivals" /></Row>
+          <Row title="Shop the look" text="The lookbook section"><Switch checked={r.homeSections.lookbook} onChange={(v) => set("homeSections", { lookbook: v })} label="Show Shop the look" /></Row>
+        </Card>
+
         <Card title="Delivery charges">
           <div className="grid gap-4 sm:grid-cols-2">
             <Field label="Free delivery above (₹)" hint="Orders at or above this amount ship free. 0 = always free."><Input inputMode="numeric" value={r.shipping.freeAbove} onChange={(e) => set("shipping", { freeAbove: num(e.target.value) })} /></Field>
