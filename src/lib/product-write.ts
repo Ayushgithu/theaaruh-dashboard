@@ -18,6 +18,7 @@ export function fieldsFromInput(v: ProductInput) {
   return {
     quantity: units,
     sizes: v.sizes,
+    kidSizes: v.kidSizes,
     colors: v.colors,
     fabric: v.fabric,
     washCare: v.washCare,

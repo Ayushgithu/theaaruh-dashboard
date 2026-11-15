@@ -28,7 +28,7 @@ const schema = z.object({
 type Values = z.infer<typeof schema>;
 
 const SIZE_PRESETS = ["XS", "S", "M", "L", "XL", "XXL", "XXXL", "Free Size"];
-const KIDS_PRESETS = ["0-6M", "6-12M", "1-2Y", "2-3Y", "3-4Y", "4-5Y", "5-6Y", "6-7Y", "7-8Y", "8-9Y", "9-10Y", "10-12Y", "12-14Y"];
+const KIDS_PRESETS = ["0-6 Mo", "6-12 Mo", "1-2 Yr", "2-3 Yr", "3-4 Yr", "4-5 Yr", "5-6 Yr", "6-7 Yr", "7-8 Yr", "8-9 Yr", "9-10 Yr", "10-12 Yr", "12-14 Yr"];
 const BADGES = ["New", "Best Seller", "Trending", "Deal"];
 const COLLECTIONS = ["Suit Sets", "Sarees", "Co-ord Sets", "Dresses", "Kurtis", "Lehengas"];
 const ACCESSORY_CATEGORIES = ["Dupattas", "Jewellery", "Bags", "Footwear"];
@@ -46,6 +46,8 @@ export function ProductForm({ type, product, categories = [], onSave, onCancel }
   const [badges, setBadges] = React.useState<string[]>(product?.badges ?? []);
   const [sizes, setSizes] = React.useState<{ label: string; qty: string }[]>((product?.sizes ?? []).map((s) => ({ label: s.label, qty: String(s.qty) })));
   const [customSize, setCustomSize] = React.useState("");
+  const [kidSizes, setKidSizes] = React.useState<{ label: string; extra: string }[]>((product?.kidSizes ?? []).map((k) => ({ label: k.label, extra: String(k.extra) })));
+  const [customKid, setCustomKid] = React.useState("");
   const [colors, setColors] = React.useState<{ name: string; hex: string; images: string[]; files: File[] }[]>((product?.colors ?? []).map((c) => ({ name: c.name, hex: c.hex ?? "#8c1d40", images: c.images ?? [], files: [] })));
   const [flashOn, setFlashOn] = React.useState(!!product?.flashRaw);
   const [flashPrice, setFlashPrice] = React.useState(product?.flashRaw ? String(product.flashRaw.price) : "");
@@ -55,6 +57,9 @@ export function ProductForm({ type, product, categories = [], onSave, onCancel }
   const [exchangeable, setExchangeable] = React.useState(product?.exchangeable !== false);
   const [guides, setGuides] = React.useState<{ name: string; slug: string; active: boolean }[]>([]);
   const [guideSlugs, setGuideSlugs] = React.useState<string[]>(product?.sizeGuides ?? []);
+  // which size pickers customers get: Women only (default), Kids only, or both (twinning set)
+  const showKids = clothing && guideSlugs.includes("kids");
+  const showWomen = clothing && (!showKids || guideSlugs.some((g) => g !== "kids"));
   React.useEffect(() => {
     if (!clothing) return;
     fetch("/api/admin/size-guides").then((r) => (r.ok ? r.json() : null)).then((j) => { if (j?.guides) setGuides(j.guides); }).catch(() => {});
@@ -84,6 +89,12 @@ export function ProductForm({ type, product, categories = [], onSave, onCancel }
   const cats = [...new Set([...categories, ...(clothing ? COLLECTIONS : ACCESSORY_CATEGORIES)])];
 
   const toggleSize = (label: string) => setSizes((cur) => (cur.some((s) => s.label === label) ? cur.filter((s) => s.label !== label) : [...cur, { label, qty: "5" }]));
+  const toggleKid = (label: string) => setKidSizes((cur) => (cur.some((s) => s.label === label) ? cur.filter((s) => s.label !== label) : [...cur, { label, extra: "0" }]));
+  const addCustomKid = () => {
+    const label = customKid.trim();
+    if (label && !kidSizes.some((s) => s.label.toLowerCase() === label.toLowerCase())) setKidSizes((c) => [...c, { label, extra: "0" }]);
+    setCustomKid("");
+  };
   const addCustom = () => {
     const label = customSize.trim();
     if (label && !sizes.some((s) => s.label.toLowerCase() === label.toLowerCase())) setSizes((c) => [...c, { label, qty: "5" }]);
@@ -91,7 +102,9 @@ export function ProductForm({ type, product, categories = [], onSave, onCancel }
   };
 
   const submit = async (v: Values) => {
-    if (clothing && sizes.length === 0 && !v.units) { setError("units", { message: "Add sizes with stock, or enter the units in stock" }); return; }
+    const womenSizes = showWomen ? sizes : [];
+    if (showKids && kidSizes.length === 0) { toast.error("Add at least one kid's size (or untick Kids in the size guide)"); return; }
+    if (clothing && womenSizes.length === 0 && !v.units) { setError("units", { message: "Add sizes with stock, or enter the units in stock" }); return; }
     if (flashOn && (!Number(flashPrice) || Number(flashPrice) >= Number(v.price))) { toast.error("The flash price must be lower than the normal price"); return; }
     if (flashOn && (!flashEnds || new Date(flashEnds).getTime() <= Date.now())) { toast.error("Choose a future end time for the flash sale"); return; }
     setBusy(true);
@@ -114,8 +127,9 @@ export function ProductForm({ type, product, categories = [], onSave, onCancel }
       await onSave({
         type, name: v.name, brand: "", category: v.category,
         price: Number(v.price), mrp: v.mrp ? Number(v.mrp) : undefined,
-        condition: "New", units: clothing && sizes.length ? undefined : Number(v.units || 0), featured, tags: [], badges,
-        sizes: clothing ? sizes.map((s) => ({ label: s.label, qty: Number(s.qty) || 0 })) : [],
+        condition: "New", units: clothing && womenSizes.length ? undefined : Number(v.units || 0), featured, tags: [], badges,
+        sizes: clothing ? womenSizes.map((s) => ({ label: s.label, qty: Number(s.qty) || 0 })) : [],
+        kidSizes: showKids ? kidSizes.map((k) => ({ label: k.label, extra: Number(k.extra) || 0 })) : [],
         sizeGuides: clothing ? guideSlugs : [],
         colors: colorPayload, videoUrl: videoUrl.trim(), returnable, exchangeable, flashPrice: flashOn ? Number(flashPrice) : undefined, flashEndsAt: flashOn ? new Date(flashEnds).toISOString() : undefined,
         fabric: v.fabric?.trim() ?? "", fit: v.fit?.trim() ?? "", occasion: v.occasion?.trim() ?? "", washCare: v.washCare?.trim() ?? "",
@@ -139,12 +153,29 @@ export function ProductForm({ type, product, categories = [], onSave, onCancel }
         </Field>
         <Field label="Selling price (₹)" error={errors.price?.message}><Input inputMode="numeric" aria-invalid={!!errors.price} {...register("price")} /></Field>
         <Field label="Original price / MRP (₹)" error={errors.mrp?.message} hint={off > 0 ? `Shown struck through with ${off}% off` : "Shown struck through with a % off"}><Input inputMode="numeric" {...register("mrp")} /></Field>
-        {!(clothing && sizes.length > 0) && (
+        {!(clothing && showWomen && sizes.length > 0) && (
           <Field label="Units in stock" error={errors.units?.message} hint="0 = sold out · 1–3 shows as low stock · reduces automatically when customers buy"><Input inputMode="numeric" {...register("units")} /></Field>
         )}
       </div>
 
-      {clothing && (
+      {clothing && guides.length > 0 && (
+        <div className="rounded-sm border border-line p-4">
+          <p className="text-sm font-semibold text-ink">Who is this product for? (size chart &amp; sizes)</p>
+          <p className="mb-3 text-xs">Choose who this product is for. Women: women&apos;s sizes with stock. Kids: kids&apos; age sizes, each with an optional extra price. Both: a twinning set, customers pick both sizes. This also decides which size charts customers see.</p>
+          <div className="flex flex-wrap gap-2">
+            {guides.map((g) => {
+              const on = guideSlugs.includes(g.slug);
+              return (
+                <button key={g.slug} type="button" aria-pressed={on} onClick={() => setGuideSlugs((cur) => (cur.includes(g.slug) ? cur.filter((x) => x !== g.slug) : [...cur, g.slug]))} className={on ? "rounded-full border border-primary bg-primary px-3.5 py-1.5 text-sm font-semibold text-white" : "rounded-full border border-line bg-card px-3.5 py-1.5 text-sm font-semibold text-ink hover:border-primary"}>
+                  {on ? "✓ " : ""}{g.name}{g.active ? "" : " (hidden)"}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {showWomen && (
         <div className="rounded-sm border border-line p-4">
           <p className="text-sm font-semibold text-ink">Sizes &amp; stock</p>
           <p className="mb-3 text-xs">Tap the sizes you stitch, then enter how many pieces you have in each. Customers must choose a size to order.</p>
@@ -157,16 +188,6 @@ export function ProductForm({ type, product, categories = [], onSave, onCancel }
               <button key={s.label} type="button" aria-pressed onClick={() => toggleSize(s.label)} className="rounded-full border border-primary bg-primary px-3.5 py-1.5 text-sm font-semibold text-white">{s.label} ×</button>
             ))}
           </div>
-          {guideSlugs.includes("kids") && (
-            <div className="mt-3">
-              <p className="mb-1.5 text-xs font-medium text-ink">Kids sizes (by age)</p>
-              <div className="flex flex-wrap gap-2">
-                {KIDS_PRESETS.filter((k) => !sizes.some((x) => x.label === k)).map((k) => (
-                  <button key={k} type="button" aria-pressed={false} onClick={() => toggleSize(k)} className="rounded-full border border-line bg-card px-3.5 py-1.5 text-sm font-semibold text-ink hover:border-primary">{k}</button>
-                ))}
-              </div>
-            </div>
-          )}
           <div className="mt-3 flex gap-2">
             <Input aria-label="Custom size" placeholder="Custom size, e.g. 38" value={customSize} onChange={(e) => setCustomSize(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); addCustom(); } }} className="max-w-48" />
             <Button type="button" variant="soft" size="sm" onClick={addCustom}><Plus className="h-4 w-4" /> Add size</Button>
@@ -185,20 +206,34 @@ export function ProductForm({ type, product, categories = [], onSave, onCancel }
         </div>
       )}
 
-      {clothing && guides.length > 0 && (
+      {showKids && (
         <div className="rounded-sm border border-line p-4">
-          <p className="text-sm font-semibold text-ink">Size guide for this product</p>
-          <p className="mb-3 text-xs">Tick the chart(s) customers should see: Women for women&apos;s wear, Kids for children&apos;s wear, or both for twinning sets. If you tick none, all charts are shown.</p>
+          <p className="text-sm font-semibold text-ink">Kids sizes &amp; price</p>
+          <p className="mb-3 text-xs">Tap the age sizes available. Kids sizes have no stock count. The product price is for the smallest sizes; for bigger sizes add an extra amount (leave 0 to keep the same price). Customers see the price change when they pick a size.</p>
           <div className="flex flex-wrap gap-2">
-            {guides.map((g) => {
-              const on = guideSlugs.includes(g.slug);
-              return (
-                <button key={g.slug} type="button" aria-pressed={on} onClick={() => setGuideSlugs((cur) => (cur.includes(g.slug) ? cur.filter((x) => x !== g.slug) : [...cur, g.slug]))} className={on ? "rounded-full border border-primary bg-primary px-3.5 py-1.5 text-sm font-semibold text-white" : "rounded-full border border-line bg-card px-3.5 py-1.5 text-sm font-semibold text-ink hover:border-primary"}>
-                  {on ? "✓ " : ""}{g.name}{g.active ? "" : " (hidden)"}
-                </button>
-              );
+            {KIDS_PRESETS.map((k) => {
+              const on = kidSizes.some((x) => x.label === k);
+              return <button key={k} type="button" aria-pressed={on} onClick={() => toggleKid(k)} className={on ? "rounded-full border border-primary bg-primary px-3.5 py-1.5 text-sm font-semibold text-white" : "rounded-full border border-line bg-card px-3.5 py-1.5 text-sm font-medium text-ink hover:border-primary"}>{k}</button>;
             })}
+            {kidSizes.filter((s) => !KIDS_PRESETS.includes(s.label)).map((s) => (
+              <button key={s.label} type="button" aria-pressed onClick={() => toggleKid(s.label)} className="rounded-full border border-primary bg-primary px-3.5 py-1.5 text-sm font-semibold text-white">{s.label} ×</button>
+            ))}
           </div>
+          <div className="mt-3 flex gap-2">
+            <Input aria-label="Custom kids size" placeholder="Custom, e.g. 13-14 Yr" value={customKid} onChange={(e) => setCustomKid(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); addCustomKid(); } }} className="max-w-52" maxLength={14} />
+            <Button type="button" variant="soft" size="sm" onClick={addCustomKid}><Plus className="h-4 w-4" /> Add size</Button>
+          </div>
+          {kidSizes.length > 0 && (
+            <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
+              {kidSizes.map((k, i) => (
+                <label key={k.label} className="text-sm">
+                  <span className="mb-1 block font-medium text-ink">{k.label} — extra ₹</span>
+                  <Input inputMode="numeric" aria-label={`Extra price for kids size ${k.label}`} value={k.extra} onChange={(e) => setKidSizes((cur) => cur.map((x, j) => (j === i ? { ...x, extra: e.target.value.replace(/\D/g, "").slice(0, 6) } : x)))} />
+                </label>
+              ))}
+              {price > 0 && <p className="col-span-full text-xs">Example: with the price ₹{price}, a size with extra ₹300 is sold for ₹{price + 300}.</p>}
+            </div>
+          )}
         </div>
       )}
 
