@@ -19,6 +19,24 @@ function client() {
 
 export const cloudinaryFolder = () => process.env.CLOUDINARY_FOLDER || "store";
 
+/** Creates credentials for a browser upload without exposing the Cloudinary API secret. */
+export function signVideoUpload(timestamp: number) {
+  const c = client();
+  const config = c.config();
+  if (!config.cloud_name || !config.api_key || !config.api_secret) {
+    throw new HttpError("Cloudinary is not configured correctly.", 503);
+  }
+  const folder = `${cloudinaryFolder()}/videos`;
+  const params = { folder, timestamp };
+  return {
+    cloudName: config.cloud_name,
+    apiKey: config.api_key,
+    folder,
+    timestamp,
+    signature: c.utils.api_sign_request(params, config.api_secret),
+  };
+}
+
 /** Uploads a buffer to Cloudinary and resolves with its result (secure_url, public_id, bytes, …). */
 export function uploadToCloudinary(buffer: Buffer, resourceType: "image" | "video"): Promise<UploadApiResponse> {
   const c = client();

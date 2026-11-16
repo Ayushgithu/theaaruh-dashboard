@@ -38,11 +38,10 @@ In **Returns**, "Book pickup with Shiprocket" arranges the reverse pickup. *This
 mocked responses only — ship one test order first and check the weight, address and COD amount in your Shiprocket panel.*
 
 ## Photos & videos (Cloudinary)
-Set the `CLOUDINARY_*` variables (see `.env.example`). Uploads go: browser → this server → **Cloudinary**; the Cloudinary link and details are then saved in
-**MongoDB** (`images` collection) and the product keeps a short address (`/api/images/<id>` or `/api/videos/<id>`). When anyone opens that address the server looks the
-record up in MongoDB and sends the browser to the Cloudinary file. Deleting a product's photo also deletes it from Cloudinary. Without the keys, photos fall back to being stored in MongoDB (old behaviour); videos need Cloudinary.
-Existing photos keep working. **The website must use the same updated `/api/images/[id]` route** (and add `/api/videos/[id]`), because it shows these addresses too.
-Note: hosts such as Vercel limit request bodies to about 4.5 MB, so large videos should be pasted as a link or the upload moved to direct-from-browser signed uploads.
+Set the `CLOUDINARY_*` variables (see `.env.example`). Product photos go through this server to **Cloudinary**; their details are saved in
+**MongoDB** (`images` collection), and products keep a short address (`/api/images/<id>`). Video uploads are signed by this server and sent directly from the browser
+to Cloudinary, so the API secret stays private and large files bypass server request-body limits. Deleting a product's photo or a Cloudinary video also deletes it from Cloudinary.
+Without the keys, photos fall back to being stored in MongoDB (old behaviour); video uploads need Cloudinary. Existing photos keep working. **The website must use the same updated `/api/images/[id]` route**, because it shows these addresses too.
 
 ## Razorpay
 Set `RAZORPAY_KEY_ID`, `RAZORPAY_KEY_SECRET` (refunds on cancel/return, COD advance) and `RAZORPAY_WEBHOOK_SECRET`.

@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import type { VideoItem, VideoPickProduct, VideoSection } from "@/lib/video-types";
 import { cloudinaryPoster, parseVideoLink, ytThumb, VIDEO_MAX_BYTES } from "@/lib/video-shared";
 import { postJson, uploadImages } from "@/lib/api";
-import { cloudinaryReady, uploadVideoToCloudinary } from "@/lib/video-upload";
+import { uploadVideoToCloudinary } from "@/lib/video-upload";
 import { cn, formatPrice } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Field, Input, Switch } from "@/components/ui/form";
@@ -117,10 +117,9 @@ function VideoForm({ item, products, onSave, onCancel }: { item: VideoItem | nul
             </div>
             <div className="min-w-0 flex-1 space-y-2">
               <input ref={fileRef} type="file" accept="video/mp4,video/webm,video/quicktime" className="sr-only" onChange={(e) => { selectFile(e.target.files?.[0] ?? null); e.target.value = ""; }} />
-              <Button type="button" variant="outline" onClick={() => fileRef.current?.click()} disabled={busy || !cloudinaryReady}><Upload className="h-4 w-4" /> {file || item?.kind === "cloudinary" ? "Choose a different video" : "Choose video"}</Button>
+              <Button type="button" variant="outline" onClick={() => fileRef.current?.click()} disabled={busy}><Upload className="h-4 w-4" /> {file || item?.kind === "cloudinary" ? "Choose a different video" : "Choose video"}</Button>
               {file && <p className="text-sm text-ink">{file.name} · {(file.size / 1024 / 1024).toFixed(1)} MB</p>}
               {!file && item?.kind === "cloudinary" && <p className="text-xs">Current video is kept unless you choose a new one.</p>}
-              {!cloudinaryReady && <p role="alert" className="rounded-sm border border-amber-300 bg-amber-50 p-2 text-xs text-amber-900">Video upload is not set up yet. Add <strong>NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME</strong> and <strong>NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET</strong> in Vercel (dashboard project) and redeploy. Until then you can still use the “Paste link” tab.</p>}
               <p className="text-xs">MP4, WebM or MOV, up to {VIDEO_MAX_BYTES / 1024 / 1024} MB. Best: a vertical (9:16) clip of 15–30 seconds. Videos are stored on Cloudinary and shown in a light 720p version on the website.</p>
             </div>
           </div>
