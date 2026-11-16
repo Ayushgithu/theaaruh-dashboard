@@ -4,6 +4,7 @@ import { formatPrice } from "@/lib/utils";
 import { AdminPageHeader } from "@/components/admin/shell";
 import { StatusBadge } from "@/components/ui/badge";
 import { StatCard } from "@/components/ui/stat-card";
+import { LowStockTable, RecentCustomersTable, RecentOrdersTable } from "@/components/admin/dashboard-tables";
 import { AutoRefresh } from "@/components/admin/auto-refresh";
 import { getDashboard } from "@/lib/repo";
 
@@ -43,6 +44,10 @@ export default async function DashboardPage() {
           {d.shop.lowStock} product{d.shop.lowStock > 1 ? "s are" : " is"} running low (3 or fewer units left). <Link href="/admin/clothing" className="underline">Check stock</Link>
         </p>
       )}
+
+      <div className="mb-6">
+        <RecentOrdersTable orders={d.recentOrders ?? []} />
+      </div>
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
         {stats.map(({ label, value, note, Icon, small }) => (
@@ -102,6 +107,11 @@ export default async function DashboardPage() {
             )}
           </section>
         </div>
+      </div>
+
+      <div className="mt-6 grid gap-6 xl:grid-cols-2">
+        <RecentCustomersTable customers={d.recentCustomers ?? []} />
+        <LowStockTable products={d.lowStockItems ?? []} />
       </div>
     </>
   );

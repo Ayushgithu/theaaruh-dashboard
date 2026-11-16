@@ -6,7 +6,7 @@ import { Loader2, Plus, Star, X } from "lucide-react";
 import { toast } from "sonner";
 import { z } from "zod";
 import type { Product, ProductType } from "@/lib/types";
-import { uploadImages } from "@/lib/api";
+import { uploadImages, uploadVideo } from "@/lib/api";
 import { discountPct } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Checkbox, Field, Input, Select, Switch, Textarea } from "@/components/ui/form";
@@ -50,6 +50,14 @@ export function ProductForm({ type, product, categories = [], onSave, onCancel }
   const [flashPrice, setFlashPrice] = React.useState(product?.flashRaw ? String(product.flashRaw.price) : "");
   const [flashEnds, setFlashEnds] = React.useState(() => { const e = product?.flashRaw?.endsAt; if (!e) return ""; const d = new Date(e); const p = (n: number) => String(n).padStart(2, "0"); return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}T${p(d.getHours())}:${p(d.getMinutes())}`; });
   const [videoUrl, setVideoUrl] = React.useState(product?.videoUrl ?? "");
+  const [videoBusy, setVideoBusy] = React.useState(false);
+  const pickVideo = async (f?: File) => {
+    if (!f) return;
+    setVideoBusy(true);
+    try { setVideoUrl(await uploadVideo(f)); toast.success("Video uploaded"); }
+    catch (e) { toast.error("Video upload failed", { description: e instanceof Error ? e.message : "Please try again." }); }
+    finally { setVideoBusy(false); }
+  };
   const [returnable, setReturnable] = React.useState(product?.returnable !== false);
   const [exchangeable, setExchangeable] = React.useState(product?.exchangeable !== false);
   const [specs, setSpecs] = React.useState<{ k: string; v: string }[]>(product ? Object.entries(product.specs).map(([k, v]) => ({ k, v })) : []);
@@ -230,7 +238,15 @@ export function ProductForm({ type, product, categories = [], onSave, onCancel }
         <div className="flex items-center justify-between gap-3 rounded-sm border border-line bg-surface p-4"><div><p className="text-sm font-semibold text-ink">Allow return (refund)</p><p className="text-xs">Switch off for sale or custom pieces.</p></div><Switch checked={returnable} onChange={setReturnable} label="Allow return" /></div>
         <div className="flex items-center justify-between gap-3 rounded-sm border border-line bg-surface p-4"><div><p className="text-sm font-semibold text-ink">Allow exchange</p><p className="text-xs">Customers can swap for another size.</p></div><Switch checked={exchangeable} onChange={setExchangeable} label="Allow exchange" /></div>
       </div>
-      <Field label="Product video link (optional)" hint="A YouTube link or a direct .mp4 link. It appears as a play button in the photo gallery — great for fabric close-ups and 360° turns."><Input value={videoUrl} onChange={(e) => setVideoUrl(e.target.value)} placeholder="https://youtube.com/shorts/…" /></Field>
+      <Field label="Product video (optional)" hint="Upload a short video (up to 50 MB) or paste a YouTube / .mp4 link. It appears as a play button in the photo gallery — great for fabric close-ups and 360° turns.">
+        <div className="flex flex-wrap items-center gap-2">
+          <Input className="min-w-0 flex-1" value={videoUrl} onChange={(e) => setVideoUrl(e.target.value)} placeholder="https://youtube.com/shorts/…" />
+          <label className="inline-flex min-h-11 cursor-pointer items-center gap-2 rounded-sm border border-line px-3 text-sm font-semibold text-primary hover:bg-surface">
+            {videoBusy ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />} Upload video
+            <input type="file" accept="video/*" hidden disabled={videoBusy} onChange={(e) => { void pickVideo(e.target.files?.[0]); e.target.value = ""; }} />
+          </label>
+        </div>
+      </Field>
 
       <Field label="Description" error={errors.description?.message}><Textarea className="min-h-24" aria-invalid={!!errors.description} {...register("description")} /></Field>
       <Field label="Highlights" hint="Up to 3 short lines (one per line), shown on the product page."><Textarea className="min-h-20" placeholder={"Soft pure-cotton fabric\nHand-block printed\nComes with dupatta"} {...register("highlights")} /></Field>

@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
 import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { makeEnquiry, makeProduct } from "../fixtures";
+import { makeEnquiry, makeOrder, makeProduct } from "../fixtures";
 
 vi.mock("@/lib/repo", () => ({ getDashboard: vi.fn() }));
 vi.mock("@/lib/auth", () => ({ getSession: vi.fn() }));
@@ -19,6 +19,7 @@ describe("Dashboard page (server component)", () => {
       laptops: 12, accessories: 8, thisMonth: 5, fresh: 2, weekly: [1, 0, 3, 2, 4, 1, 5],
       top: [makeProduct({ name: "MacBook Air M1", views: 1320 }), makeProduct({ id: "2", name: "Dell Latitude", views: 800 })],
       recent: [makeEnquiry({ name: "Priya Singh", message: "Bulk pricing for 10 laptops?" })],
+      recentOrders: [], recentCustomers: [], lowStockItems: [],
     });
     render(await DashboardPage());
     expect(screen.getByText("20")).toBeInTheDocument(); // 12 + 8
@@ -33,7 +34,7 @@ describe("Dashboard page (server component)", () => {
   it("shows shop numbers: revenue, orders to process, active carts and a low-stock warning", async () => {
     vi.mocked(getDashboard).mockResolvedValue({
       shop: { revenue: 125000, ordersThisMonth: 4, toProcess: 2, activeCarts: 3, customers: 9, lowStock: 2 },
-      laptops: 1, accessories: 1, thisMonth: 0, fresh: 0, weekly: [0, 0, 0, 0, 0, 0, 0], top: [], recent: [],
+      laptops: 1, accessories: 1, thisMonth: 0, fresh: 0, weekly: [0, 0, 0, 0, 0, 0, 0], top: [], recent: [], recentOrders: [], recentCustomers: [], lowStockItems: [],
     });
     render(await DashboardPage());
     expect(screen.getByText("₹1,25,000")).toBeInTheDocument();
@@ -45,11 +46,28 @@ describe("Dashboard page (server component)", () => {
   });
 
   it("handles a brand-new store with no data", async () => {
-    vi.mocked(getDashboard).mockResolvedValue({ shop: { revenue: 0, ordersThisMonth: 0, toProcess: 0, activeCarts: 0, customers: 0, lowStock: 0 }, laptops: 0, accessories: 0, thisMonth: 0, fresh: 0, weekly: [0, 0, 0, 0, 0, 0, 0], top: [], recent: [] });
+    vi.mocked(getDashboard).mockResolvedValue({ shop: { revenue: 0, ordersThisMonth: 0, toProcess: 0, activeCarts: 0, customers: 0, lowStock: 0 }, laptops: 0, accessories: 0, thisMonth: 0, fresh: 0, weekly: [0, 0, 0, 0, 0, 0, 0], top: [], recent: [], recentOrders: [], recentCustomers: [], lowStockItems: [] });
     render(await DashboardPage());
     expect(screen.getByText("No views yet")).toBeInTheDocument();
     expect(screen.getByText(/No enquiries yet/)).toBeInTheDocument();
     expect(screen.getByText("Add products to see them here.")).toBeInTheDocument();
+  });
+});
+
+describe("Dashboard tables", () => {
+  it("lists recent orders, new customers and low-stock products", async () => {
+    vi.mocked(getDashboard).mockResolvedValue({
+      shop: { revenue: 0, ordersThisMonth: 1, toProcess: 1, activeCarts: 0, customers: 1, lowStock: 1 },
+      laptops: 1, accessories: 0, thisMonth: 0, fresh: 0, weekly: [0, 0, 0, 0, 0, 0, 0], top: [], recent: [],
+      recentOrders: [makeOrder({ orderNumber: "LC-TABLE-1" })],
+      recentCustomers: [{ id: "c1", name: "Meera Joshi", email: "meera@x.com", phone: "9000000001", createdAt: "2026-10-01T10:00:00.000Z" }],
+      lowStockItems: [makeProduct({ id: "9", name: "Last Few Kurti", quantity: 2 })],
+    });
+    render(await DashboardPage());
+    expect(screen.getAllByText("LC-TABLE-1").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("Meera Joshi").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("Last Few Kurti").length).toBeGreaterThan(0);
+    expect(screen.getByRole("link", { name: "Manage stock" })).toHaveAttribute("href", "/admin/clothing");
   });
 });
 

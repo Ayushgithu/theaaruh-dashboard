@@ -21,7 +21,7 @@ function Card({ title, hint, children }: { title: string; hint?: string; childre
   );
 }
 const Row = ({ title, text, children }: { title: string; text?: string; children: React.ReactNode }) => (
-  <div className="flex items-center justify-between gap-4 rounded-sm border border-line bg-surface p-4"><div><p className="text-sm font-semibold text-ink">{title}</p>{text && <p className="text-xs">{text}</p>}</div>{children}</div>
+  <div className="flex items-center justify-between gap-4 rounded-sm border border-line bg-surface p-4"><div className="min-w-0"><p className="text-sm font-semibold text-ink">{title}</p>{text && <p className="text-xs">{text}</p>}</div>{children}</div>
 );
 
 export function StoreRulesAdmin({ initial }: { initial: StoreRules }) {
@@ -131,8 +131,8 @@ export function StoreRulesAdmin({ initial }: { initial: StoreRules }) {
             {r.delivery.overrides.map((o, i) => {
               const upd = (p: Partial<typeof o>) => set("delivery", { overrides: r.delivery.overrides.map((x, j) => (j === i ? { ...x, ...p } : x)) });
               return (
-                <div key={i} className="mb-2 grid grid-cols-[1fr_1fr_1fr_auto] gap-2">
-                  <Input aria-label={`Pincode starts with ${i + 1}`} placeholder="Pincode starts with" value={o.prefix} onChange={(e) => upd({ prefix: e.target.value.replace(/\D/g, "").slice(0, 6) })} />
+                <div key={i} className="mb-2 grid grid-cols-[1fr_1fr_auto] gap-2 sm:grid-cols-[1.4fr_1fr_1fr_auto]">
+                  <Input className="col-span-3 sm:col-span-1" aria-label={`Pincode starts with ${i + 1}`} placeholder="Pincode starts with" value={o.prefix} onChange={(e) => upd({ prefix: e.target.value.replace(/\D/g, "").slice(0, 6) })} />
                   <Input aria-label={`Min days ${i + 1}`} placeholder="Min days" inputMode="numeric" value={o.min} onChange={(e) => upd({ min: num(e.target.value) })} />
                   <Input aria-label={`Max days ${i + 1}`} placeholder="Max days" inputMode="numeric" value={o.max} onChange={(e) => upd({ max: num(e.target.value) })} />
                   <Button type="button" variant="ghost" size="icon" aria-label={`Remove area ${i + 1}`} onClick={() => set("delivery", { overrides: r.delivery.overrides.filter((_, j) => j !== i) })}><X className="h-4 w-4" /></Button>

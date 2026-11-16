@@ -37,6 +37,18 @@ token = `SHIPROCKET_WEBHOOK_TOKEN`) and every courier scan updates the order, th
 In **Returns**, "Book pickup with Shiprocket" arranges the reverse pickup. *This integration was written to Shiprocket's public API docs and tested against
 mocked responses only — ship one test order first and check the weight, address and COD amount in your Shiprocket panel.*
 
+## Photos & videos (Cloudinary)
+Set the `CLOUDINARY_*` variables (see `.env.example`). Uploads go: browser → this server → **Cloudinary**; the Cloudinary link and details are then saved in
+**MongoDB** (`images` collection) and the product keeps a short address (`/api/images/<id>` or `/api/videos/<id>`). When anyone opens that address the server looks the
+record up in MongoDB and sends the browser to the Cloudinary file. Deleting a product's photo also deletes it from Cloudinary. Without the keys, photos fall back to being stored in MongoDB (old behaviour); videos need Cloudinary.
+Existing photos keep working. **The website must use the same updated `/api/images/[id]` route** (and add `/api/videos/[id]`), because it shows these addresses too.
+Note: hosts such as Vercel limit request bodies to about 4.5 MB, so large videos should be pasted as a link or the upload moved to direct-from-browser signed uploads.
+
+## Razorpay
+Set `RAZORPAY_KEY_ID`, `RAZORPAY_KEY_SECRET` (refunds on cancel/return, COD advance) and `RAZORPAY_WEBHOOK_SECRET`.
+In Razorpay → Settings → Webhooks add `https://YOUR-DASHBOARD/api/razorpay/webhook` with events `payment.captured` and `order.paid`.
+It confirms orders whose customer paid but never returned to the site (signature- and amount-checked, safe to receive twice).
+
 ## Returns & exchanges
 Customer asks from the order page → you **Approve / Reject** → arrange pickup → **Mark received** (puts the piece back in the right size) → **Refund**
 (online via Razorpay, or record a manual UPI/bank refund for COD) or **Mark replacement shipped** (takes the new size out of stock). Customers get an email at each step.

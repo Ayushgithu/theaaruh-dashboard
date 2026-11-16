@@ -1,12 +1,14 @@
 "use client";
 import * as React from "react";
 import Link from "next/link";
-import { ChevronDown, ExternalLink, LogOut, Settings, User } from "lucide-react";
+import { ChevronDown, ExternalLink, LogOut, Moon, Settings, Sun, User } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useTheme } from "@/hooks/use-theme";
 
 /** Top-right "who is signed in" chip with a small account menu. */
 export function AdminAccountMenu({ name, email, onLogout }: { name: string; email: string; onLogout: () => void | Promise<void> }) {
   const [open, setOpen] = React.useState(false);
+  const { theme, toggle } = useTheme();
   const ref = React.useRef<HTMLDivElement>(null);
   const display = name.trim() || email.split("@")[0] || "Admin";
   const initial = (display[0] ?? "A").toUpperCase();
@@ -45,7 +47,7 @@ export function AdminAccountMenu({ name, email, onLogout }: { name: string; emai
       </button>
 
       {open && (
-        <div role="menu" className="absolute right-0 top-full z-50 mt-2 w-72 rounded-sm border border-line bg-card p-2 shadow-lift">
+        <div role="menu" className="fixed inset-x-3 top-16 z-50 rounded-sm border border-line bg-card p-2 shadow-lift sm:absolute sm:inset-x-auto sm:right-0 sm:top-full sm:mt-2 sm:w-72">
           <div className="flex items-center gap-3 border-b border-line px-3 pb-3 pt-2">
             <span className={cn(avatar, "h-11 w-11 text-base")}>{initial}</span>
             <div className="min-w-0">
@@ -58,6 +60,7 @@ export function AdminAccountMenu({ name, email, onLogout }: { name: string; emai
           </div>
           <div className="pt-2">
             <a role="menuitem" href={(process.env.NEXT_PUBLIC_SITE_URL ?? "").replace(/\/$/, "") || "/"} target="_blank" rel="noopener noreferrer" onClick={() => setOpen(false)} className={item}><ExternalLink className="h-4 w-4" /> View website</a>
+            <button role="menuitem" type="button" onClick={() => { toggle(); setOpen(false); }} className={cn(item, "sm:hidden")}>{theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />} {theme === "dark" ? "Light mode" : "Dark mode"}</button>
             <Link role="menuitem" href="/admin/settings" onClick={() => setOpen(false)} className={item}><Settings className="h-4 w-4" /> Settings</Link>
             <button role="menuitem" type="button" onClick={() => { setOpen(false); void onLogout(); }} className={cn(item, "text-red-600 hover:bg-red-50")}><LogOut className="h-4 w-4" /> Sign out</button>
           </div>

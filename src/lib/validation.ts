@@ -77,7 +77,7 @@ export const productInput = z.object({
   badges: z.array(z.string().trim().max(24)).max(5).default([]),
   flashPrice: z.coerce.number().int().min(1).max(10_000_000).optional(),
   flashEndsAt: z.string().max(40).optional(),
-  videoUrl: z.string().trim().max(300).refine((v) => v === "" || /^https?:\/\//i.test(v), "Video link must start with https://").default(""),
+  videoUrl: z.string().trim().max(300).refine((v) => v === "" || /^https?:\/\//i.test(v) || /^\/api\/videos\/[a-f0-9]{24}$/.test(v), "Video link must start with https://").default(""),
   returnable: z.boolean().default(true),
   exchangeable: z.boolean().default(true),
   featured: z.boolean().default(false),
