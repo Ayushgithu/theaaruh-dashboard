@@ -27,6 +27,7 @@ const ProductSchema = new Schema(
     art: { type: Schema.Types.Mixed }, // vector placeholder shown when no photos
     sizes: { type: [new Schema({ label: { type: String, required: true }, qty: { type: Number, default: 0, min: 0 } }, { _id: false })], default: [] },
     colors: { type: [new Schema({ name: { type: String, required: true }, hex: String, images: { type: [String], default: [] } }, { _id: false })], default: [] },
+    kidSizes: { type: [new Schema({ label: { type: String, required: true }, extra: { type: Number, default: 0, min: 0 } }, { _id: false })], default: [] }, // kids age sizes; no stock, only an extra price
     videoUrl: { type: String, default: "" },
     flashPrice: Number,
     flashEndsAt: Date,
@@ -34,6 +35,7 @@ const ProductSchema = new Schema(
     exchangeable: { type: Boolean, default: true },
     fabric: { type: String, default: "" },
     washCare: { type: String, default: "" },
+    sizeGuides: { type: [String], default: [] }, // slugs of the size charts that apply (Dashboard → Size guides); empty = show all
     fit: { type: String, default: "" },
     occasion: { type: String, default: "" },
     badges: { type: [String], default: [] },

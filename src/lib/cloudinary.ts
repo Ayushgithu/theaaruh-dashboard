@@ -1,5 +1,6 @@
 import { v2 as cloudinary, type UploadApiResponse } from "cloudinary";
 import { HttpError } from "./api-helpers";
+import { cloudinaryPublicId } from "./video-shared";
 
 /** Set CLOUDINARY_URL (cloudinary://KEY:SECRET@CLOUD_NAME) or the three CLOUDINARY_* variables. */
 export const cloudinaryConfigured = () =>
@@ -29,4 +30,18 @@ export function uploadToCloudinary(buffer: Buffer, resourceType: "image" | "vide
 
 export async function deleteFromCloudinary(publicId: string, resourceType: "image" | "video") {
   await client().uploader.destroy(publicId, { resource_type: resourceType, invalidate: true });
+}
+
+/**
+ * Deletes a video from Cloudinary so unused files do not fill your storage.
+ * Without Cloudinary configuration, the file remains in the Cloudinary library for manual cleanup.
+ */
+export async function deleteCloudinaryVideo(src: string): Promise<void> {
+  const id = cloudinaryPublicId(src);
+  if (!id || !cloudinaryConfigured()) return;
+  try {
+    await deleteFromCloudinary(id, "video");
+  } catch (e) {
+    console.error("[cloudinary] could not delete", e); // never block the owner's action because of this
+  }
 }

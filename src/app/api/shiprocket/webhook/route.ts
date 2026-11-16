@@ -6,7 +6,7 @@ import { parseCourierDate } from "@/lib/shiprocket";
 import { applyTrackingEvents } from "@/lib/tracking-sync";
 import { notifyOrder } from "@/lib/order-notify";
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
+
 /**
  * Shiprocket → Settings → API → Webhooks: URL = https://YOUR-DASHBOARD/api/shiprocket/webhook, and a token of your choice
  * (the same value as SHIPROCKET_WEBHOOK_TOKEN). Every courier scan then updates the order and the customer's tracking page.

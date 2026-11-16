@@ -31,7 +31,7 @@ export const GET = adminRoute(async () => {
   ]);
 
   const items: AdminNotification[] = [
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
     ...(orders as any[]).map((o): AdminNotification => ({
       id: `order:${o._id}`,
       kind: "order",
@@ -41,7 +41,7 @@ export const GET = adminRoute(async () => {
       // an online order counts from the moment it was paid, not from when the checkout started
       at: new Date(o.payment?.paidAt ?? o.createdAt).toISOString(),
     })),
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
     ...(enquiries as any[]).map((e): AdminNotification => {
       const sell = e.source === "Sell request";
       return {

@@ -1,7 +1,7 @@
 // @vitest-environment node
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
+
 vi.mock("@/lib/auth", () => ({ getSession: vi.fn(), createSession: vi.fn(), destroySession: vi.fn() }));
 vi.mock("@/lib/db", () => ({ connectDB: vi.fn() }));
 const box = vi.hoisted(() => ({ rules: null as any, saved: null as any }));

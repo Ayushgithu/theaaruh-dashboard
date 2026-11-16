@@ -57,6 +57,7 @@ const lines = z.array(z.string().trim().min(1).max(300)).max(30);
 
 const sizeRow = z.object({ label: z.string().trim().min(1).max(12), qty: z.coerce.number().int().min(0).max(9999) });
 const imageUrl = z.string().regex(/^\/api\/images\/[a-f0-9]{24}$/, "Invalid image");
+const kidSizeRow = z.object({ label: z.string().trim().min(1).max(14), extra: z.coerce.number().int().min(0).max(100000).default(0) });
 const colorRow = z.object({ name: z.string().trim().min(1).max(30), hex: z.string().regex(/^#[0-9a-fA-F]{6}$/).optional(), images: z.array(imageUrl).max(8).default([]) });
 
 export const productInput = z.object({
@@ -69,9 +70,11 @@ export const productInput = z.object({
   condition: z.enum(["A", "B", "C", "New"]).default("New"),
   units: num(0, 999).optional(),
   sizes: z.array(sizeRow).max(12).default([]),
+  kidSizes: z.array(kidSizeRow).max(16).default([]),
   colors: z.array(colorRow).max(12).default([]),
   fabric: z.string().trim().max(120).default(""),
   washCare: z.string().trim().max(400).default(""),
+  sizeGuides: z.array(z.string().trim().max(60)).max(8).default([]),
   fit: z.string().trim().max(60).default(""),
   occasion: z.string().trim().max(60).default(""),
   badges: z.array(z.string().trim().max(24)).max(5).default([]),
@@ -217,6 +220,7 @@ export const storeRulesSchema = z.object({
   }),
   shipment: z.object({ weightKg: z.coerce.number().min(0.05).max(30), lengthCm: z.coerce.number().min(1).max(200), breadthCm: z.coerce.number().min(1).max(200), heightCm: z.coerce.number().min(0.5).max(200) }),
   wallet: z.object({ enabled: z.boolean(), bonusPercent: z.coerce.number().min(0).max(30) }),
+  homeSections: z.object({ bestSellers: z.boolean(), shopBy: z.boolean(), newArrivals: z.boolean(), lookbook: z.boolean() }).default({ bestSellers: true, shopBy: true, newArrivals: true, lookbook: true }),
   delivery: z.object({
     handlingDays: z.coerce.number().int().min(0).max(10), cutoffHour: z.coerce.number().int().min(0).max(23),
     transitMin: z.coerce.number().int().min(0).max(30), transitMax: z.coerce.number().int().min(0).max(30), sundayOff: z.boolean(),
@@ -234,7 +238,7 @@ export const verifyPaymentSchema = z.object({
 export const cartAddSchema = z.object({
   productId: z.string().regex(/^[a-f0-9]{24}$/, "Invalid product"),
   quantity: z.coerce.number().int().min(1).max(20).default(1),
-  size: z.string().trim().max(12).optional(),
+  size: z.string().trim().max(40).optional(),
   color: z.string().trim().max(30).optional(),
 });
 

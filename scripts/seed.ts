@@ -32,13 +32,13 @@ async function main() {
 
   if (!adminOnly) {
     if ((await ProductModel.countDocuments()) === 0) {
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+
       await ProductModel.insertMany(products.map(({ id, createdAt, ...p }) => ({ ...p, quantity: (p.sizes ?? []).reduce((n, s) => n + s.qty, 0), createdAt: new Date(createdAt) })));
       console.log(`Inserted ${products.length} sample products`);
     } else console.log("Products already exist, skipping sample products");
 
     if ((await BannerModel.countDocuments()) === 0) {
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+
       await BannerModel.insertMany(banners.map(({ id, ...b }) => b));
       console.log(`Inserted ${banners.length} sample banners`);
     } else console.log("Banners already exist, skipping sample banners");

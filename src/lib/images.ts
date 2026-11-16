@@ -4,28 +4,24 @@ import { ImageModel } from "@/models/Image";
 import { HttpError } from "./api-helpers";
 import { cloudinaryConfigured, deleteFromCloudinary, uploadToCloudinary } from "./cloudinary";
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
+
 const MAX_BYTES = 8 * 1024 * 1024;
 const MAX_VIDEO_BYTES = 50 * 1024 * 1024;
 const URL_RE = /^\/api\/(?:images|videos)\/([a-f0-9]{24})$/;
 
 /**
  * Validates and resizes an image (max 1600px, WebP), uploads it to Cloudinary, saves the Cloudinary details
- * in MongoDB and returns the URL the site uses (/api/images/<id>). Without Cloudinary keys it stores the bytes in MongoDB instead.
+ * in MongoDB and returns the URL the site uses (/api/images/<id>).
  */
 export async function saveImage(file: File): Promise<string> {
   if (file.size > MAX_BYTES) throw new HttpError("Each photo must be smaller than 8 MB.", 413);
+  if (!cloudinaryConfigured()) throw new HttpError("Image uploads require Cloudinary. Configure CLOUDINARY_URL or the CLOUDINARY_* settings.", 503);
   const input = Buffer.from(await file.arrayBuffer());
   let out: Buffer;
   try {
     out = await sharp(input).rotate().resize({ width: 1600, height: 1600, fit: "inside", withoutEnlargement: true }).webp({ quality: 80 }).toBuffer();
   } catch {
     throw new HttpError(`"${file.name}" is not a valid image.`, 400);
-  }
-  if (!cloudinaryConfigured()) {
-    await connectDB();
-    const doc = await ImageModel.create({ data: out, contentType: "image/webp", size: out.length, resourceType: "image" });
-    return `/api/images/${doc._id}`;
   }
   let up;
   try { up = await uploadToCloudinary(out, "image"); }

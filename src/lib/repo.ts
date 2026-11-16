@@ -12,7 +12,7 @@ import type { Announcement, ArtKind, Banner, Enquiry, Product, ProductType, Tone
 
 /* All database reads used by pages. Returns plain, serialisable objects. */
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+
 type Doc = Record<string, any>;
 const iso = (d: unknown) => (d ? new Date(d as string).toISOString() : new Date().toISOString());
 
@@ -60,12 +60,14 @@ export function toProduct(d: Doc): Product {
     art: d.art ?? { kind: d.type === "laptop" ? "laptop" : d.type === "clothing" ? "cloth" : "hub", tone: "silver", hue: d.type === "clothing" ? 340 : 215 },
     images: d.images?.length ? d.images : undefined,
     sizes: Array.isArray(d.sizes) && d.sizes.length ? d.sizes.map((s: Doc) => ({ label: s.label, qty: s.qty ?? 0 })) : undefined,
+    kidSizes: Array.isArray(d.kidSizes) && d.kidSizes.length ? d.kidSizes.map((s: Doc) => ({ label: s.label, extra: Math.max(0, s.extra ?? 0) })) : undefined,
     colors: Array.isArray(d.colors) && d.colors.length ? d.colors.map((c: Doc) => ({ name: c.name, hex: c.hex || undefined, images: c.images?.length ? c.images : undefined })) : undefined,
     videoUrl: d.videoUrl || undefined,
     returnable: d.returnable !== false,
     exchangeable: d.exchangeable !== false,
     fabric: d.fabric || undefined,
     washCare: d.washCare || undefined,
+    sizeGuides: Array.isArray(d.sizeGuides) && d.sizeGuides.length ? d.sizeGuides.map(String) : undefined,
     fit: d.fit || undefined,
     occasion: d.occasion || undefined,
     badges: d.badges ?? [],

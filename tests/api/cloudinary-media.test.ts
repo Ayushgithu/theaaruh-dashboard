@@ -2,7 +2,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import sharp from "sharp";
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
+
 vi.mock("@/lib/db", () => ({ connectDB: vi.fn() }));
 const cl = vi.hoisted(() => ({ configured: true, upload: vi.fn(), destroy: vi.fn() }));
 vi.mock("@/lib/cloudinary", () => ({ cloudinaryConfigured: () => cl.configured, uploadToCloudinary: cl.upload, deleteFromCloudinary: cl.destroy }));
@@ -30,11 +30,11 @@ describe("saving media", () => {
     expect(Img.create).toHaveBeenCalledWith(expect.objectContaining({ url: "https://res.cloudinary.com/x/image/upload/a.webp", publicId: "store/images/a", resourceType: "image" }));
     expect(Img.create.mock.calls[0][0].data).toBeUndefined();
   });
-  it("falls back to MongoDB bytes when Cloudinary is not configured", async () => {
+  it("requires Cloudinary for new image uploads", async () => {
     cl.configured = false;
-    await saveImage(await png());
+    await expect(saveImage(await png())).rejects.toMatchObject({ status: 503 });
     expect(cl.upload).not.toHaveBeenCalled();
-    expect(Buffer.isBuffer(Img.create.mock.calls[0][0].data)).toBe(true);
+    expect(Img.create).not.toHaveBeenCalled();
   });
   it("cleans up the Cloudinary file if saving the record fails", async () => {
     Img.create.mockRejectedValue(new Error("db down"));

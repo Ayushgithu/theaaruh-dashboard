@@ -2,7 +2,7 @@ import { connectDB } from "./db";
 import { SettingModel } from "@/models/Setting";
 import { mergeRules, type StoreRules } from "./rules";
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
+
 let cache: { at: number; rules: StoreRules } | null = null;
 const TTL = 15_000;
 

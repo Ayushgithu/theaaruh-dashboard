@@ -1,6 +1,6 @@
 "use client";
 import * as React from "react";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Link2, Megaphone, Pencil, Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
@@ -23,11 +23,11 @@ type Values = z.infer<typeof formSchema>;
 function AnnouncementForm({ item, onSave, onCancel }: { item: Announcement | null; onSave: (v: Omit<Announcement, "id">) => Promise<boolean>; onCancel: () => void }) {
   const [active, setActive] = React.useState(item?.active ?? true);
   const [busy, setBusy] = React.useState(false);
-  const { register, handleSubmit, watch, formState: { errors } } = useForm<Values>({
+  const { register, handleSubmit, control, formState: { errors } } = useForm<Values>({
     resolver: zodResolver(formSchema),
     defaultValues: { text: item?.text ?? "", href: item?.href ?? "" },
   });
-  const text = watch("text");
+  const text = useWatch({ control, name: "text" }) ?? "";
 
   const submit = async (v: Values) => {
     setBusy(true);

@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 import { connectDB } from "@/lib/db";
 import { ImageModel } from "@/models/Image";
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
+
 /** Asks Cloudinary for the best format and quality for each browser (f_auto,q_auto). */
 const optimized = (url: string, kind: "image" | "video") => url.replace(`/${kind}/upload/`, `/${kind}/upload/f_auto,q_auto/`);
 

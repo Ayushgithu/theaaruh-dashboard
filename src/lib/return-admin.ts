@@ -14,7 +14,7 @@ import { notifyReturn } from "./return-notify";
 import { toReturn } from "./repo-returns";
 import type { ReturnRequest } from "./types";
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
+
 export const returnActionSchema = z.discriminatedUnion("action", [
   z.object({ action: z.literal("approve"), note: z.string().trim().max(300).optional() }),
   z.object({ action: z.literal("reject"), note: z.string().trim().min(3, "Tell the customer why").max(300) }),

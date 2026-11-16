@@ -11,7 +11,7 @@ import { POST } from "@/app/api/admin/announcements/route";
 import { DELETE, PUT } from "@/app/api/admin/announcements/[id]/route";
 import { ID, ctx, jsonReq } from "./utils";
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+
 const Model = AnnouncementModel as any;
 beforeEach(() => vi.mocked(getSession).mockResolvedValue({ id: "a1", email: "o@shop.com", name: "Owner" }));
 

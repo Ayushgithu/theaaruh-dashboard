@@ -15,7 +15,7 @@ import { POST as forgot } from "@/app/api/admin/forgot-password/route";
 import { POST as reset } from "@/app/api/admin/reset-password/route";
 import { ctx, freshIp, jsonReq } from "./utils";
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+
 const findOne = (AdminModel as any).findOne as ReturnType<typeof vi.fn>;
 const flush = async () => { await Promise.all(pending.splice(0)); };
 let n = 0;

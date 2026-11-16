@@ -2,6 +2,7 @@ export type Condition = "A" | "B" | "C" | "New";
 export type Stock = "in-stock" | "low" | "out";
 export type ProductType = "clothing" | "accessory" | "laptop";
 export interface SizeStock { label: string; qty: number }
+export interface KidSize { label: string; extra: number }
 export interface ColorOpt { name: string; hex?: string; images?: string[] }
 export type Tone = "silver" | "graphite" | "black" | "blue";
 export type ArtKind =
@@ -39,9 +40,11 @@ export interface Product {
   images?: string[]; // real photo URLs once uploaded; placeholders render art when empty
   /* clothing */
   sizes?: SizeStock[]; // per-size stock; `quantity` is their sum
+  kidSizes?: KidSize[]; // kids age sizes (no stock): `extra` is added to the price
   colors?: ColorOpt[];
   fabric?: string;
   washCare?: string;
+  sizeGuides?: string[]; // slugs of the size guides ticked for this product
   fit?: string;
   occasion?: string;
   badges?: string[]; // "New", "Best Seller", "Trending", "Deal" …
@@ -94,7 +97,7 @@ export interface Announcement {
 }
 
 /* ------------------------------ Shop (cart / orders) ------------------------------ */
-export type CardProduct = Pick<Product, "id" | "slug" | "name" | "brand" | "price" | "mrp" | "condition" | "stock" | "type" | "art" | "images" | "sizes" | "colors"> & {
+export type CardProduct = Pick<Product, "id" | "slug" | "name" | "brand" | "price" | "mrp" | "condition" | "stock" | "type" | "art" | "images" | "sizes" | "kidSizes" | "colors"> & {
   /** Units currently available to buy. */
   available: number;
 };

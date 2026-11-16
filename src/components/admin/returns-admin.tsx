@@ -1,6 +1,7 @@
 "use client";
 import * as React from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { Loader2, PackageCheck, Search, Truck, Undo2 } from "lucide-react";
 import { toast } from "sonner";
 import type { ReturnRequest, ReturnStatus } from "@/lib/types";
@@ -123,7 +124,7 @@ export function ReturnsAdmin({ initial, shiprocket, online, wallet = { bonus: 0 
 
             {open.photos.length > 0 && (
               <section><p className="mb-2 text-xs font-semibold">Customer photos</p>
-                <ul className="flex flex-wrap gap-2">{open.photos.map((u) => <li key={u}><a href={u} target="_blank" rel="noopener noreferrer">{/* eslint-disable-next-line @next/next/no-img-element */}<img src={u} alt="Customer photo" className="h-24 w-24 rounded-sm border border-line object-cover" /></a></li>)}</ul></section>
+                <ul className="flex flex-wrap gap-2">{open.photos.map((u) => <li key={u}><a href={u} target="_blank" rel="noopener noreferrer"><Image src={u} alt="Customer photo" width={96} height={96} unoptimized className="h-24 w-24 rounded-sm border border-line object-cover" /></a></li>)}</ul></section>
             )}
 
             {(open.pickup?.awb || open.exchangeShipment?.awb || open.refund) && (

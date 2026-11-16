@@ -5,7 +5,7 @@ import { markOrderPaid } from "@/lib/orders";
 import { notifyOrder } from "@/lib/order-notify";
 import { verifyWebhookSignature } from "@/lib/razorpay";
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
+
 /**
  * Razorpay Dashboard → Settings → Webhooks → Add: URL = https://YOUR-DASHBOARD/api/razorpay/webhook,
  * secret = RAZORPAY_WEBHOOK_SECRET, events = payment.captured, order.paid, payment.failed.

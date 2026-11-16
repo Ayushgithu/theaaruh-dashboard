@@ -13,7 +13,7 @@ export const POST = adminRoute(async (req, { params }, session) => {
   if (!mongoose.isValidObjectId(id)) throw new HttpError("Customer not found.", 404);
   const v = body.parse(await readJson(req));
   await connectDB();
-  const u: any = await UserModel.findById(id).select("guest walletBalance").lean(); // eslint-disable-line @typescript-eslint/no-explicit-any
+  const u: any = await UserModel.findById(id).select("guest walletBalance").lean();
   if (!u) throw new HttpError("Customer not found.", 404);
   if (u.guest) throw new HttpError("Guest shoppers do not have a wallet.", 400);
   const meta = { type: "adjustment" as const, note: v.note, by: session.name ?? "Admin" };

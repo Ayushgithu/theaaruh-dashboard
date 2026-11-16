@@ -3,7 +3,7 @@ import { ReturnModel } from "@/models/ReturnRequest";
 import { ProductModel } from "@/models/Product";
 import type { ReturnRequest } from "./types";
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
+
 type Doc = any;
 const iso = (d: unknown) => (d ? new Date(d as string | number | Date).toISOString() : new Date().toISOString());
 

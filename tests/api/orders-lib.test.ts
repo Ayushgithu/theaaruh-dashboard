@@ -1,7 +1,7 @@
 // @vitest-environment node
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
+
 vi.mock("@/lib/db", () => ({ connectDB: vi.fn() }));
 const box = vi.hoisted(() => ({ rules: null as any }));
 vi.mock("@/lib/settings", () => ({ getRules: async () => box.rules }));
