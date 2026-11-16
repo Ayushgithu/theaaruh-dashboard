@@ -2,7 +2,7 @@
 import * as React from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { BarChart3, Bell, ShieldCheck, GalleryHorizontal, ImageIcon, Inbox, SlidersHorizontal, Undo2, Shirt, LayoutDashboard, Megaphone, Menu, Settings, Headphones, ExternalLink, ShoppingBag, ShoppingCart, Users, Search, GripVertical, Ruler, LayoutGrid } from "lucide-react";
+import { BarChart3, Bell, ShieldCheck, GalleryHorizontal, ImageIcon, Inbox, SlidersHorizontal, Undo2, Shirt, LayoutDashboard, Megaphone, Menu, Settings, Headphones, ExternalLink, ShoppingBag, ShoppingCart, Users, Search, GripVertical, Ruler, LayoutGrid, Clapperboard } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Drawer } from "@/components/ui/drawer";
 import { LogoMark } from "@/components/ui/icons";
@@ -57,6 +57,7 @@ const sections: { title: string; items: NavItem[] }[] = [
       { label: "Clothing", href: "/admin/clothing", Icon: Shirt },
       { label: "Accessories", href: "/admin/accessories", Icon: Headphones },
       { label: "Collections", href: "/admin/collections", Icon: LayoutGrid },
+      { label: "Videos", href: "/admin/videos", Icon: Clapperboard },
       { label: "Size guides", href: "/admin/size-guides", Icon: Ruler },
     ],
   },
