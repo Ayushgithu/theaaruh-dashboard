@@ -1,4 +1,5 @@
 import { Check, Circle, X } from "lucide-react";
+import Image from "next/image";
 import type { Order, OrderStatus } from "@/lib/types";
 import { STATUS_LABEL } from "@/lib/order-flow";
 import { cn } from "@/lib/utils";
@@ -27,7 +28,7 @@ export function PaymentBadge({ order }: { order: Order }) {
 export function ItemThumb({ item, className }: { item: { image?: string; art: Order["items"][number]["art"]; name: string }; className?: string }) {
   return (
     <span className={cn("block shrink-0 overflow-hidden rounded-lg", className ?? "h-[4.5rem] w-14")} style={{ background: `hsl(${item.art.hue} 90% 95%)` }}>
-      {item.image ? /* eslint-disable-next-line @next/next/no-img-element */ <img src={item.image} alt={item.name} className="h-full w-full object-cover" /> : <ProductArt {...item.art} className="p-0.5" title={item.name} />}
+      {item.image ? <Image src={item.image} alt={item.name} width={72} height={96} unoptimized className="h-full w-full object-cover" /> : <ProductArt {...item.art} className="p-0.5" title={item.name} />}
     </span>
   );
 }

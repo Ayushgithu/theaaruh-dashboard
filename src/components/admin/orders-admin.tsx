@@ -79,7 +79,7 @@ export function OrdersAdmin({ initial, shiprocket = false }: { initial: Order[];
   return (
     <>
       <AdminPageHeader title="Orders" description="Every order placed on the website. Update the status and the customer is notified by email."
-        action={toPack.length > 0 ? <Button asChild variant="outline"><a href={`/print/orders?ids=${toPack.slice(0, 60).map((o) => o.id).join(",")}`} target="_blank" rel="noopener noreferrer"><Printer className="h-4 w-4" /> Print slips for {Math.min(toPack.length, 60)} order{toPack.length === 1 ? "" : "s"} to pack</a></Button> : undefined} />
+        action={toPack.length > 0 ? <Button asChild variant="outline" className="h-auto max-w-full whitespace-normal py-2 text-center"><a href={`/print/orders?ids=${toPack.slice(0, 60).map((o) => o.id).join(",")}`} target="_blank" rel="noopener noreferrer"><Printer className="h-4 w-4" /> Print slips for {Math.min(toPack.length, 60)} order{toPack.length === 1 ? "" : "s"} to pack</a></Button> : undefined} />
 
       <div className="mb-4 flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
         <div role="tablist" aria-label="Filter orders" className="no-scrollbar flex gap-1 overflow-x-auto rounded-sm bg-card p-1 shadow-card ring-1 ring-line">
@@ -106,16 +106,16 @@ export function OrdersAdmin({ initial, shiprocket = false }: { initial: Order[];
       ) : (
         <>
           <div className="hidden overflow-x-auto rounded-sm border border-line bg-card shadow-card md:block">
-            <table className="w-full min-w-[820px] text-sm">
+            <table className="w-full min-w-[620px] text-sm xl:min-w-[820px]">
               <thead className="bg-surface text-left text-xs font-semibold text-body">
-                <tr><th className="px-4 py-3">Order</th><th className="px-4 py-3">Customer</th><th className="px-4 py-3">Items</th><th className="px-4 py-3">Total</th><th className="px-4 py-3">Payment</th><th className="px-4 py-3">Status</th><th className="px-4 py-3">Placed</th></tr>
+                <tr><th className="px-4 py-3">Order</th><th className="px-4 py-3">Customer</th><th className="hidden px-4 py-3 xl:table-cell">Items</th><th className="px-4 py-3">Total</th><th className="px-4 py-3">Payment</th><th className="px-4 py-3">Status</th><th className="px-4 py-3">Placed</th></tr>
               </thead>
               <tbody className="divide-y divide-line">
                 {list.map((o) => (
                   <tr key={o.id} tabIndex={0} onClick={() => setOpenId(o.id)} onKeyDown={(e) => e.key === "Enter" && setOpenId(o.id)} className="cursor-pointer hover:bg-primary-faint/50 focus-visible:bg-primary-faint/50">
                     <td className="px-4 py-3 font-semibold text-ink">{o.orderNumber}</td>
-                    <td className="px-4 py-3"><p className="font-medium text-ink">{o.customer.name}</p><p className="text-xs">{o.customer.phone}</p></td>
-                    <td className="max-w-[14rem] px-4 py-3"><p className="truncate">{o.items.map((i) => `${i.quantity}× ${i.name}${i.size ? ` (${i.size})` : ""}`).join(", ")}</p></td>
+                    <td className="px-4 py-3"><p className="font-medium text-ink">{o.customer.name}</p><p className="text-xs">{o.customer.phone}</p><p className="mt-0.5 max-w-[12rem] truncate text-xs xl:hidden">{o.items.map((i) => `${i.quantity}× ${i.name}`).join(", ")}</p></td>
+                    <td className="hidden max-w-[14rem] px-4 py-3 xl:table-cell"><p className="truncate">{o.items.map((i) => `${i.quantity}× ${i.name}${i.size ? ` (${i.size})` : ""}`).join(", ")}</p></td>
                     <td className="px-4 py-3 font-semibold text-ink">{formatPrice(o.total)}</td>
                     <td className="px-4 py-3"><PaymentBadge order={o} /></td>
                     <td className="px-4 py-3"><OrderStatusBadge status={o.status} /></td>

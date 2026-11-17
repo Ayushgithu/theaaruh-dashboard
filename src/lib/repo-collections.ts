@@ -2,7 +2,7 @@ import { connectDB } from "./db";
 import { CollectionModel } from "@/models/Collection";
 import type { CollectionItem } from "./collection-types";
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+
 type Doc = Record<string, any>;
 
 export const slugify = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "").slice(0, 40) || "collection";

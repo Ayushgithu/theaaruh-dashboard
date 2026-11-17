@@ -1,6 +1,6 @@
 import { mapCourierStatus } from "./shiprocket";
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
+
 export interface CourierEvent { status: string; at: Date; location?: string; note?: string }
 
 /** Adds new scan events to the order and moves its status forward (shipped / delivered). Returns which customer email to send, if any. */

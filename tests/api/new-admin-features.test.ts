@@ -1,16 +1,16 @@
 // @vitest-environment node
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
+
 vi.mock("@/lib/auth", () => ({ getSession: vi.fn(), createSession: vi.fn(), destroySession: vi.fn() }));
 vi.mock("@/lib/db", () => ({ connectDB: vi.fn() }));
 const box = vi.hoisted(() => ({ rules: null as any, saved: null as any }));
 vi.mock("@/lib/settings", () => ({ getRules: async () => box.rules, saveRules: async (r: any) => { box.saved = r; return r; } }));
 vi.mock("@/lib/return-notify", () => ({ notifyReturn: vi.fn() }));
 vi.mock("@/lib/order-notify", () => ({ notifyOrder: vi.fn() }));
-vi.mock("@/lib/orders", () => ({ putBack: vi.fn() }));
+vi.mock("@/lib/orders", () => ({ putBack: vi.fn(), markOrderPaid: vi.fn() }));
 const rp = vi.hoisted(() => ({ refund: vi.fn() }));
-vi.mock("@/lib/razorpay", () => ({ razorpayConfigured: () => true, razorpay: () => ({ payments: { refund: rp.refund } }) }));
+vi.mock("@/lib/razorpay", async (orig) => ({ ...(await orig<typeof import("@/lib/razorpay")>()), razorpayConfigured: () => true, razorpay: () => ({ payments: { refund: rp.refund } }) }));
 vi.mock("@/models/ReturnRequest", () => ({ ReturnModel: { findById: vi.fn(), find: vi.fn(), findOne: vi.fn() } }));
 vi.mock("@/models/Order", () => ({ OrderModel: { findById: vi.fn(), findOne: vi.fn() } }));
 vi.mock("@/models/Product", () => ({ ProductModel: { updateOne: vi.fn(), create: vi.fn(), exists: vi.fn() } }));
@@ -265,5 +265,32 @@ describe("POST /api/admin/products/bulk", () => {
     expect((await bulk(jsonReq("/x", "POST", { rows: Array.from({ length: 201 }, () => ({ name: "x" })) }), ctx())).status).toBe(400);
     vi.mocked(getSession).mockResolvedValue(null as any);
     expect((await bulk(jsonReq("/x", "POST", { rows: [{ name: "x" }] }), ctx())).status).toBe(401);
+  });
+});
+
+/* ------------------------------------------------------------ Razorpay webhook */
+describe("POST /api/razorpay/webhook", async () => {
+  const crypto = await import("node:crypto");
+  const { POST: rzpHook } = await import("@/app/api/razorpay/webhook/route");
+  const { markOrderPaid } = await import("@/lib/orders");
+  const sign = (b: string) => crypto.createHmac("sha256", "whsec").update(b).digest("hex");
+  const call = (body: any, sig?: string) => { const raw = JSON.stringify(body); return rzpHook(jsonReq("/api/razorpay/webhook", "POST", raw, { "x-razorpay-signature": sig ?? sign(raw) }), ctx()); };
+  const captured = (amount = 100000) => ({ event: "payment.captured", payload: { payment: { entity: { id: "pay_1", order_id: "order_1", amount } } } });
+  beforeEach(() => { vi.stubEnv("RAZORPAY_WEBHOOK_SECRET", "whsec"); (markOrderPaid as any).mockReset?.(); });
+  it("rejects a bad signature", async () => { expect((await call(captured(), "bad")).status).toBe(401); });
+  it("rejects when no secret is configured", async () => { vi.stubEnv("RAZORPAY_WEBHOOK_SECRET", ""); expect((await call(captured())).status).toBe(503); });
+  it("ignores unrelated events", async () => { expect(await (await call({ event: "payment.failed" })).json()).toMatchObject({ ignored: true }); });
+  it("ignores a payment whose amount does not match the order", async () => {
+    Order.findOne.mockResolvedValue({ _id: "o1", orderNumber: "OD-1", total: 1000, walletUsed: 0, payment: { method: "razorpay" } });
+    expect(await (await call(captured(5))).json()).toMatchObject({ reason: "amount-mismatch" });
+    expect(markOrderPaid).not.toHaveBeenCalled();
+  });
+  it("marks a matching order paid and emails the customer", async () => {
+    const o = { _id: "o1", orderNumber: "OD-1", total: 1000, walletUsed: 0, payment: { method: "razorpay" } };
+    Order.findOne.mockResolvedValue(o); Order.findById.mockResolvedValue(o);
+    (markOrderPaid as any).mockResolvedValue(true);
+    expect(await (await call(captured())).json()).toMatchObject({ updated: true });
+    expect(markOrderPaid).toHaveBeenCalledWith("o1", "pay_1");
+    expect(notifyOrder).toHaveBeenCalledWith("paid", o);
   });
 });

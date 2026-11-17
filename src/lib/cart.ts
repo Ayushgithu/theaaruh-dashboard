@@ -8,7 +8,7 @@ import { getCartLines } from "./repo-shop";
 
 const MAX_PER_LINE = 10;
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
+
 async function loadProduct(productId: string) {
   if (!mongoose.isValidObjectId(productId)) throw new HttpError("Product not found.", 404);
   await connectDB();

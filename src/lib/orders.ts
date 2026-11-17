@@ -16,7 +16,7 @@ import type { Address, CustomerUser, OrderStatus, PaymentMethod } from "./types"
 
 const PAYMENT_WINDOW_MS = 30 * 60_000;
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
+
 type Item = { productId: string; quantity: number; name: string; size?: string };
 
 const makeOrderNumber = () => {

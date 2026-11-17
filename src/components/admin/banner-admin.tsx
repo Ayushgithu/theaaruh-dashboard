@@ -1,5 +1,6 @@
 "use client";
 import * as React from "react";
+import Image from "next/image";
 import { ImageOff, Pencil, Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { useForm } from "react-hook-form";
@@ -147,7 +148,7 @@ export function BannerAdmin({ initial }: { initial: Banner[] }) {
           {items.map((b) => (
             <li key={b.id} className={cn("flex flex-col gap-4 rounded-sm border border-line bg-card p-4 shadow-card sm:flex-row sm:items-center", !b.active && "opacity-75")}>
               <div className={cn("relative h-28 w-full shrink-0 overflow-hidden rounded-sm bg-gradient-to-br sm:h-24 sm:w-44", themeCls[b.theme])}>
-                {b.image && /* eslint-disable-next-line @next/next/no-img-element */ <img src={b.image} alt="" className="absolute inset-0 h-full w-full object-cover" />}
+                {b.image && <Image src={b.image} alt="" fill sizes="(max-width: 640px) 100vw, 176px" unoptimized className="object-cover" />}
                 <span className={cn("absolute inset-x-3 bottom-3 line-clamp-2 text-xs font-semibold", b.theme === "sky" ? "text-ink" : "text-white")}>{b.title}</span>
               </div>
               <div className="min-w-0 flex-1">

@@ -3,7 +3,7 @@ import { SizeGuideModel } from "@/models/SizeGuide";
 import { DEFAULT_SIZE_GUIDES } from "./size-guide-defaults";
 import type { SizeGuideItem } from "./size-guide-types";
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+
 type Doc = Record<string, any>;
 
 export const slugify = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "").slice(0, 40) || "guide";

@@ -177,15 +177,15 @@ export function SlideAdmin({ initial }: { initial: Slide[] }) {
       ) : (
         <ul className="grid gap-4">
           {items.map((s, idx) => (
-            <li key={s.id} className={cn("flex flex-col gap-4 rounded-sm border border-line bg-card p-4 shadow-card lg:flex-row lg:items-center", !s.active && "opacity-75")}>
+            <li key={s.id} className={cn("flex flex-col gap-4 rounded-sm border border-line bg-card p-4 shadow-card xl:flex-row xl:items-center", !s.active && "opacity-75")}>
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={s.image} alt={s.title} className="aspect-[4/1] w-full shrink-0 rounded-sm border border-line object-cover lg:w-72" />
+              <img src={s.image} alt={s.title} className="aspect-[4/1] w-full shrink-0 rounded-sm border border-line object-cover xl:w-72" />
               <div className="min-w-0 flex-1">
                 <p className="font-semibold text-ink">{s.title}</p>
                 <p className="mt-0.5 truncate text-sm">{s.href ? `Links to ${s.href}` : "No link"}{s.mobileImage ? " · has mobile image" : ""}</p>
                 <p className="mt-0.5 text-xs">Position {idx + 1} of {items.length}</p>
               </div>
-              <div className="flex flex-wrap items-center justify-between gap-3 lg:justify-end">
+              <div className="flex flex-wrap items-center justify-between gap-3 xl:justify-end">
                 <label className="flex items-center gap-2 text-sm font-medium text-ink">
                   <Switch checked={s.active} onChange={(v) => toggle(s, v)} label={`${s.active ? "Hide" : "Show"} ${s.title}`} />
                   {s.active ? "Active" : "Inactive"}

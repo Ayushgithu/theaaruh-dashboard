@@ -8,7 +8,7 @@ let cached: { token: string; exp: number } | null = null;
 export const shiprocketConfigured = () => !!(process.env.SHIPROCKET_EMAIL && process.env.SHIPROCKET_PASSWORD);
 export const resetShiprocketToken = () => { cached = null; };
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
+
 const messageOf = (j: any) => j?.message || (j?.errors ? Object.values(j.errors).flat().join(", ") : "") || "request failed";
 
 async function login(): Promise<string> {

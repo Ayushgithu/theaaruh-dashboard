@@ -2,7 +2,7 @@ import { connectDB } from "./db";
 import { OrderModel } from "@/models/Order";
 import { ReturnModel } from "@/models/ReturnRequest";
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
+
 export interface DayPoint { date: string; label: string; revenue: number; orders: number }
 export interface Bar { label: string; value: number; extra?: string }
 export interface Insights {

@@ -36,7 +36,7 @@ export default async function PrintOrdersPage({ searchParams }: { searchParams: 
         const units = o.items.reduce((n, i) => n + i.quantity, 0);
         const a = o.address;
         return (
-          <section key={o.id} className="sheet mb-8 space-y-6 rounded-2xl border border-line bg-white p-6 print:mb-0 print:rounded-none print:border-0 print:p-0" aria-label={`Order ${o.orderNumber}`}>
+          <section key={o.id} className="sheet mb-8 space-y-6 rounded-2xl border border-line bg-white p-4 sm:p-6 print:mb-0 print:rounded-none print:border-0 print:p-0" aria-label={`Order ${o.orderNumber}`}>
             {/* ---------------- packing slip ---------------- */}
             <div>
               <div className="flex items-start justify-between gap-4 border-b-2 border-ink pb-3">
@@ -51,14 +51,14 @@ export default async function PrintOrdersPage({ searchParams }: { searchParams: 
                 </div>
               </div>
 
-              <table className="mt-5 w-full text-sm">
+              <div className="mt-5 overflow-x-auto print:overflow-visible"><table className="w-full min-w-[26rem] text-sm">
                 <thead><tr className="border-b border-ink text-left text-xs uppercase tracking-wider"><th className="w-8 py-2">✓</th><th className="py-2">Item</th><th className="py-2">Size</th><th className="py-2">Colour</th><th className="py-2 text-right">Qty</th><th className="py-2 text-right">Price</th></tr></thead>
                 <tbody>
                   {o.items.map((i, k) => (
                     <tr key={k} className="border-b border-line"><td className="py-2.5"><span className="inline-block h-4 w-4 border-2 border-ink" /></td><td className="py-2.5 font-semibold">{i.name}</td><td className="py-2.5">{i.size ?? "—"}</td><td className="py-2.5">{i.color ?? "—"}</td><td className="py-2.5 text-right font-bold">{i.quantity}</td><td className="py-2.5 text-right">{formatPrice(i.price * i.quantity)}</td></tr>
                   ))}
                 </tbody>
-              </table>
+              </table></div>
               <dl className="ml-auto mt-3 w-60 space-y-1 text-sm">
                 <div className="flex justify-between"><dt>Subtotal</dt><dd>{formatPrice(o.subtotal)}</dd></div>
                 <div className="flex justify-between"><dt>Delivery</dt><dd>{o.shipping ? formatPrice(o.shipping) : "Free"}</dd></div>

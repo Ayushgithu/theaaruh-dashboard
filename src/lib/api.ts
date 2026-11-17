@@ -60,3 +60,11 @@ export async function uploadImages(files: File[]): Promise<string[]> {
   }
   return urls;
 }
+
+/** Uploads one video to Cloudinary (through the server) and returns its /api/videos/<id> URL. */
+export async function uploadVideo(file: File): Promise<string> {
+  const fd = new FormData();
+  fd.append("files", file);
+  const { urls } = await request<{ urls: string[] }>("/api/admin/upload", { method: "POST", body: fd });
+  return urls[0];
+}

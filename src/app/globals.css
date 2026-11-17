@@ -267,3 +267,10 @@ html.lenis, html.lenis body { height: auto; }
   --color-primary-light: #eab308; --color-primary-soft: #713f12; --color-primary-faint: #261c07;
   --accent-text: #fcd34d;
 }
+
+/* Phones: inputs under 16px make iOS Safari zoom the page on focus. Unlayered, so it wins over utility font sizes. */
+@media (max-width: 639px) {
+  input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]),
+  select,
+  textarea { font-size: 16px; }
+}

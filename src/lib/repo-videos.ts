@@ -6,7 +6,7 @@ import { parseVideoLink, type VideoKind } from "./video-shared";
 import { deleteCloudinaryVideo } from "./cloudinary";
 import { DEFAULT_VIDEO_SECTION, type VideoItem, type VideoSection } from "./video-types";
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+
 type Doc = Record<string, any>;
 
 const toItem = (d: Doc): VideoItem => ({

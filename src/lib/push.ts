@@ -2,7 +2,7 @@ import webpush from "web-push";
 import { connectDB } from "./db";
 import { PushSubModel } from "@/models/PushSub";
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
+
 /** Needs NEXT_PUBLIC_VAPID_PUBLIC_KEY + VAPID_PRIVATE_KEY (+ VAPID_SUBJECT, e.g. mailto:you@brand.com). Generate: npx web-push generate-vapid-keys */
 export const pushConfigured = () => !!(process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY && process.env.VAPID_PRIVATE_KEY);
 

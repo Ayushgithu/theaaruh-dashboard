@@ -5,12 +5,14 @@ import { EnquiryModel } from "@/models/Enquiry";
 import { AdminModel } from "@/models/Admin";
 import { AnnouncementModel } from "@/models/Announcement";
 import { searchProducts } from "./search";
-import { getShopStats } from "./repo-shop";
+import { getShopStats, toOrder } from "./repo-shop";
+import { OrderModel } from "@/models/Order";
+import { UserModel } from "@/models/User";
 import type { Announcement, ArtKind, Banner, Enquiry, Product, ProductType, Tone } from "./types";
 
 /* All database reads used by pages. Returns plain, serialisable objects. */
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+
 type Doc = Record<string, any>;
 const iso = (d: unknown) => (d ? new Date(d as string).toISOString() : new Date().toISOString());
 
@@ -168,7 +170,7 @@ export async function getDashboard() {
   await connectDB();
   const monthAgo = new Date(Date.now() - 30 * 86400000);
   const sevenWeeksAgo = new Date(Date.now() - 49 * 86400000);
-  const [laptops, accessories, top, thisMonth, fresh, recent, recentDates] = await Promise.all([
+  const [laptops, accessories, top, thisMonth, fresh, recent, recentDates, recentOrders, recentCustomers, lowStockItems] = await Promise.all([
     ProductModel.countDocuments({ type: { $in: ["clothing", "laptop"] } }),
     ProductModel.countDocuments({ type: "accessory" }),
     ProductModel.find({}).sort({ views: -1 }).limit(4).lean(),
@@ -176,6 +178,9 @@ export async function getDashboard() {
     EnquiryModel.countDocuments({ status: "new" }),
     EnquiryModel.find({}).sort({ createdAt: -1 }).limit(5).lean(),
     EnquiryModel.find({ createdAt: { $gte: sevenWeeksAgo } }).select("createdAt").lean(),
+    OrderModel.find({}).sort({ createdAt: -1 }).limit(5).lean(),
+    UserModel.find({ guest: { $ne: true } }).sort({ createdAt: -1 }).limit(5).lean(),
+    ProductModel.find({ quantity: { $gt: 0, $lte: 3 } }).sort({ quantity: 1 }).limit(5).lean(),
   ]);
   const weekly = Array.from({ length: 7 }, () => 0);
   for (const e of recentDates) {
@@ -188,6 +193,9 @@ export async function getDashboard() {
     laptops, accessories, thisMonth, fresh, weekly,
     top: top.map(toProduct),
     recent: recent.map(toEnquiry),
+    recentOrders: recentOrders.map(toOrder),
+    recentCustomers: (recentCustomers as Doc[]).map((u) => ({ id: String(u._id), name: String(u.name ?? ""), email: String(u.email ?? ""), phone: String(u.phone ?? ""), createdAt: iso(u.createdAt) })),
+    lowStockItems: lowStockItems.map(toProduct),
   };
 }
 

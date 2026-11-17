@@ -1,7 +1,7 @@
 import { after } from "next/server";
 import { sendOrderEmail, type OrderEmailKind } from "./email";
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
+
 /** Emails the customer after the response has been sent. A failed email never fails the order. */
 export function notifyOrder(kind: OrderEmailKind, order: any) {
   after(async () => {

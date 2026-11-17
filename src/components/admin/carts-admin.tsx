@@ -68,7 +68,7 @@ export function CartsAdmin({ initial }: { initial: AdminCart[] }) {
         <div role="tablist" aria-label="Filter carts" className="no-scrollbar flex gap-1 overflow-x-auto rounded-sm bg-card p-1 shadow-card ring-1 ring-line">
           {TABS.map((t) => <button key={t.id} role="tab" aria-selected={tab === t.id} onClick={() => setTab(t.id)} className={cn("min-h-10 shrink-0 rounded-lg px-3.5 text-sm font-medium transition", tab === t.id ? "bg-primary text-white" : "text-body hover:bg-surface")}>{t.label} <span className={cn("ml-1 text-xs", tab === t.id ? "text-white/80" : "text-slate-500")}>{initial.filter(t.match).length}</span></button>)}
         </div>
-        <div className="flex gap-2">
+        <div className="flex flex-col gap-2 sm:flex-row">
           <select aria-label="Sort carts" value={sort} onChange={(e) => setSort(e.target.value as "recent" | "value")} className="h-11 rounded-sm border border-line bg-card px-3 text-sm font-medium text-ink"><option value="recent">Latest activity</option><option value="value">Highest value</option></select>
           <div className="relative w-full sm:w-64"><Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" /><Input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search customer or product" className="pl-10" aria-label="Search carts" /></div>
         </div>

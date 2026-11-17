@@ -37,7 +37,7 @@ export function NotificationsAdmin({ configured, subscribers }: { configured: bo
           <p className="mt-1">Run <code className="rounded bg-white/70 px-1">npx web-push generate-vapid-keys</code>, then add <code className="rounded bg-white/70 px-1">NEXT_PUBLIC_VAPID_PUBLIC_KEY</code> (also on the website), <code className="rounded bg-white/70 px-1">VAPID_PRIVATE_KEY</code> and <code className="rounded bg-white/70 px-1">VAPID_SUBJECT</code> (mailto:you@brand.com) to the environment variables and redeploy.</p>
         </div>
       )}
-      <div className="grid gap-6 lg:grid-cols-[1fr_22rem]">
+      <div className="grid gap-6 xl:grid-cols-[1fr_22rem]">
         <section className="space-y-4 rounded-sm border border-line bg-card p-5 shadow-card sm:p-6">
           <p className="flex items-center gap-2 text-sm"><BellRing className="h-4 w-4 text-primary" /> <strong className="text-ink">{subscribers}</strong> subscriber{subscribers === 1 ? "" : "s"}</p>
           <div className="flex flex-wrap gap-2">{IDEAS.map((i) => <Button key={i.title} type="button" variant="soft" size="sm" onClick={() => { setTitle(i.title); setBody(i.body); setUrl(i.url); }}>{i.title}</Button>)}</div>

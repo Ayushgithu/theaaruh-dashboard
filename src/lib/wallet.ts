@@ -3,7 +3,7 @@ import { UserModel } from "@/models/User";
 import { WalletTxnModel } from "@/models/WalletTxn";
 import type { WalletTxn } from "./types";
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
+
 type Meta = { type: WalletTxn["type"]; note?: string; order?: string; returnRequest?: string; by?: string };
 
 /** Adds store credit. Returns the new balance. */

@@ -1,23 +1,29 @@
 import { VIDEO_MAX_BYTES, VIDEO_TYPES } from "./video-shared";
+import { request } from "./api";
 
-const CLOUD = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
-const PRESET = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET;
+type SignedUpload = {
+  cloudName: string;
+  apiKey: string;
+  folder: string;
+  timestamp: number;
+  signature: string;
+};
 
-/** True once the two Cloudinary settings are added in Vercel. */
-export const cloudinaryReady = Boolean(CLOUD && PRESET);
-
-/** Uploads a video straight from the browser to Cloudinary (it never passes through our server, so there is no size trouble). Resolves to the video's https link. */
-export function uploadVideoToCloudinary(file: File, onProgress: (pct: number) => void): Promise<string> {
+/** Requests a short-lived signature, then uploads directly to Cloudinary so large files bypass the app server. */
+export async function uploadVideoToCloudinary(file: File, onProgress: (pct: number) => void): Promise<string> {
+  const type = file.type || "video/mp4";
+  if (!VIDEO_TYPES.includes(type)) throw new Error("Please choose an MP4, WebM or MOV video.");
+  if (file.size > VIDEO_MAX_BYTES) throw new Error(`This video is ${(file.size / 1024 / 1024).toFixed(0)} MB. Please keep it under ${VIDEO_MAX_BYTES / 1024 / 1024} MB.`);
+  const signed = await request<SignedUpload>("/api/admin/cloudinary-signature", { method: "POST" });
   return new Promise((resolve, reject) => {
-    if (!CLOUD || !PRESET) return reject(new Error("Cloudinary is not set up yet. Add NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME and NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET in Vercel, then redeploy."));
-    const type = file.type || "video/mp4";
-    if (!VIDEO_TYPES.includes(type)) return reject(new Error("Please choose an MP4, WebM or MOV video."));
-    if (file.size > VIDEO_MAX_BYTES) return reject(new Error(`This video is ${(file.size / 1024 / 1024).toFixed(0)} MB. Please keep it under ${VIDEO_MAX_BYTES / 1024 / 1024} MB.`));
     const fd = new FormData();
     fd.append("file", file);
-    fd.append("upload_preset", PRESET);
+    fd.append("api_key", signed.apiKey);
+    fd.append("folder", signed.folder);
+    fd.append("timestamp", String(signed.timestamp));
+    fd.append("signature", signed.signature);
     const xhr = new XMLHttpRequest();
-    xhr.open("POST", `https://api.cloudinary.com/v1_1/${CLOUD}/video/upload`);
+    xhr.open("POST", `https://api.cloudinary.com/v1_1/${encodeURIComponent(signed.cloudName)}/video/upload`);
     xhr.upload.onprogress = (e) => { if (e.lengthComputable) onProgress(Math.round((e.loaded / e.total) * 100)); };
     xhr.onerror = () => reject(new Error("Could not reach Cloudinary. Check your internet connection and try again."));
     xhr.onload = () => {

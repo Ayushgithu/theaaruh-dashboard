@@ -22,7 +22,7 @@ import * as adminById from "@/app/api/admin/admins/[id]/route";
 import * as password from "@/app/api/admin/password/route";
 import { ID, ID2, URL_A, ctx, jsonReq } from "./utils";
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
+
 const Banner = BannerModel as any, Enquiry = EnquiryModel as any, Admin = AdminModel as any;
 const me = { id: ID, email: "owner@shop.com", name: "Owner" };
 beforeEach(() => vi.mocked(getSession).mockResolvedValue(me));

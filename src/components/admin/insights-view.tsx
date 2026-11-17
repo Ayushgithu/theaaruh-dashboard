@@ -38,7 +38,7 @@ export function InsightsView({ data: d }: { data: Insights }) {
       </div>
 
       <Card title="Sales per day" hint="Revenue from paid and confirmed orders">
-        <div className="flex h-44 items-end gap-[3px]" role="img" aria-label="Daily revenue chart">
+        <div className="flex h-44 items-end gap-px sm:gap-[3px]" role="img" aria-label="Daily revenue chart">
           {d.daily.map((x) => (
             <div key={x.date} className="group relative flex h-full flex-1 items-end">
               <div className="w-full rounded-t bg-primary/80 transition group-hover:bg-primary" style={{ height: `${Math.max(x.revenue ? 4 : 1, (x.revenue / max) * 100)}%` }} />

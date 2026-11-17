@@ -4,7 +4,7 @@ import { BrandModel } from "@/models/Brand";
 import { ProductModel } from "@/models/Product";
 import type { BrandItem, Slide } from "./carousel-types";
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+
 type Doc = Record<string, any>;
 
 const toSlide = (d: Doc): Slide => ({

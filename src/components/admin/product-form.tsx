@@ -1,12 +1,12 @@
 "use client";
 import * as React from "react";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2, Plus, Star, X } from "lucide-react";
 import { toast } from "sonner";
 import { z } from "zod";
 import type { Product, ProductType } from "@/lib/types";
-import { uploadImages } from "@/lib/api";
+import { uploadImages, uploadVideo } from "@/lib/api";
 import { discountPct } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Checkbox, Field, Input, Select, Switch, Textarea } from "@/components/ui/form";
@@ -33,6 +33,10 @@ const BADGES = ["New", "Best Seller", "Trending", "Deal"];
 const COLLECTIONS = ["Suit Sets", "Sarees", "Co-ord Sets", "Dresses", "Kurtis", "Lehengas"];
 const ACCESSORY_CATEGORIES = ["Dupattas", "Jewellery", "Bags", "Footwear"];
 const lines = (t?: string) => (t ?? "").split("\n").map((x) => x.trim()).filter(Boolean);
+const isFutureDate = (value: string) => {
+  const timestamp = new Date(value).getTime();
+  return Number.isFinite(timestamp) && timestamp > Date.now();
+};
 
 export function ProductForm({ type, product, categories = [], onSave, onCancel }: {
   type: ProductType;
@@ -53,6 +57,14 @@ export function ProductForm({ type, product, categories = [], onSave, onCancel }
   const [flashPrice, setFlashPrice] = React.useState(product?.flashRaw ? String(product.flashRaw.price) : "");
   const [flashEnds, setFlashEnds] = React.useState(() => { const e = product?.flashRaw?.endsAt; if (!e) return ""; const d = new Date(e); const p = (n: number) => String(n).padStart(2, "0"); return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}T${p(d.getHours())}:${p(d.getMinutes())}`; });
   const [videoUrl, setVideoUrl] = React.useState(product?.videoUrl ?? "");
+  const [videoBusy, setVideoBusy] = React.useState(false);
+  const pickVideo = async (f?: File) => {
+    if (!f) return;
+    setVideoBusy(true);
+    try { setVideoUrl(await uploadVideo(f)); toast.success("Video uploaded"); }
+    catch (e) { toast.error("Video upload failed", { description: e instanceof Error ? e.message : "Please try again." }); }
+    finally { setVideoBusy(false); }
+  };
   const [returnable, setReturnable] = React.useState(product?.returnable !== false);
   const [exchangeable, setExchangeable] = React.useState(product?.exchangeable !== false);
   const [guides, setGuides] = React.useState<{ name: string; slug: string; active: boolean }[]>([]);
@@ -69,7 +81,7 @@ export function ProductForm({ type, product, categories = [], onSave, onCancel }
   const [files, setFiles] = React.useState<File[]>([]);
   const [busy, setBusy] = React.useState(false);
 
-  const { register, handleSubmit, watch, setError, formState: { errors } } = useForm<Values>({
+  const { register, handleSubmit, control, setError, formState: { errors } } = useForm<Values>({
     resolver: zodResolver(schema),
     defaultValues: {
       name: product?.name ?? "",
@@ -82,8 +94,9 @@ export function ProductForm({ type, product, categories = [], onSave, onCancel }
       description: product?.description ?? "",
     },
   });
-  const price = Number(watch("price") || 0);
-  const mrp = Number(watch("mrp") || 0);
+  const watchedPrice = useWatch({ control, name: "price" }) ?? "";
+  const price = Number(watchedPrice || 0);
+  const mrp = Number(useWatch({ control, name: "mrp" }) || 0);
   const off = discountPct(price, mrp);
   const totalUnits = sizes.reduce((n, s) => n + (Number(s.qty) || 0), 0);
   const cats = [...new Set([...categories, ...(clothing ? COLLECTIONS : ACCESSORY_CATEGORIES)])];
@@ -106,7 +119,7 @@ export function ProductForm({ type, product, categories = [], onSave, onCancel }
     if (showKids && kidSizes.length === 0) { toast.error("Add at least one kid's size (or untick Kids in the size guide)"); return; }
     if (clothing && womenSizes.length === 0 && !v.units) { setError("units", { message: "Add sizes with stock, or enter the units in stock" }); return; }
     if (flashOn && (!Number(flashPrice) || Number(flashPrice) >= Number(v.price))) { toast.error("The flash price must be lower than the normal price"); return; }
-    if (flashOn && (!flashEnds || new Date(flashEnds).getTime() <= Date.now())) { toast.error("Choose a future end time for the flash sale"); return; }
+    if (flashOn && (!flashEnds || !isFutureDate(flashEnds))) { toast.error("Choose a future end time for the flash sale"); return; }
     setBusy(true);
     try {
       let uploaded: string[] = [];
@@ -290,7 +303,7 @@ export function ProductForm({ type, product, categories = [], onSave, onCancel }
         <div className="flex items-center justify-between gap-3"><p className="text-xs">A special price for this product only, with its own countdown. When the timer ends, the normal price comes back by itself.</p><Switch checked={flashOn} onChange={setFlashOn} label="Flash sale" /></div>
         {flashOn && (
           <div className="mt-3 grid gap-3 sm:grid-cols-2">
-            <Field label="Flash price (₹)" hint={watch("price") ? `Normal price ₹${watch("price")}` : undefined}><Input inputMode="numeric" value={flashPrice} onChange={(e) => setFlashPrice(e.target.value.replace(/\D/g, ""))} aria-label="Flash price" /></Field>
+            <Field label="Flash price (₹)" hint={watchedPrice ? `Normal price ₹${watchedPrice}` : undefined}><Input inputMode="numeric" value={flashPrice} onChange={(e) => setFlashPrice(e.target.value.replace(/\D/g, ""))} aria-label="Flash price" /></Field>
             <Field label="Ends on"><Input type="datetime-local" value={flashEnds} onChange={(e) => setFlashEnds(e.target.value)} aria-label="Flash sale ends" /></Field>
           </div>
         )}
@@ -300,7 +313,15 @@ export function ProductForm({ type, product, categories = [], onSave, onCancel }
         <div className="flex items-center justify-between gap-3 rounded-sm border border-line bg-surface p-4"><div><p className="text-sm font-semibold text-ink">Allow return (refund)</p><p className="text-xs">Switch off for sale or custom pieces.</p></div><Switch checked={returnable} onChange={setReturnable} label="Allow return" /></div>
         <div className="flex items-center justify-between gap-3 rounded-sm border border-line bg-surface p-4"><div><p className="text-sm font-semibold text-ink">Allow exchange</p><p className="text-xs">Customers can swap for another size.</p></div><Switch checked={exchangeable} onChange={setExchangeable} label="Allow exchange" /></div>
       </div>
-      <Field label="Product video link (optional)" hint="A YouTube link or a direct .mp4 link. It appears as a play button in the photo gallery — great for fabric close-ups and 360° turns."><Input value={videoUrl} onChange={(e) => setVideoUrl(e.target.value)} placeholder="https://youtube.com/shorts/…" /></Field>
+      <Field label="Product video (optional)" hint="Upload a short video (up to 50 MB) or paste a YouTube / .mp4 link. It appears as a play button in the photo gallery — great for fabric close-ups and 360° turns.">
+        <div className="flex flex-wrap items-center gap-2">
+          <Input className="min-w-0 flex-1" value={videoUrl} onChange={(e) => setVideoUrl(e.target.value)} placeholder="https://youtube.com/shorts/…" />
+          <label className="inline-flex min-h-11 cursor-pointer items-center gap-2 rounded-sm border border-line px-3 text-sm font-semibold text-primary hover:bg-surface">
+            {videoBusy ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />} Upload video
+            <input type="file" accept="video/*" hidden disabled={videoBusy} onChange={(e) => { void pickVideo(e.target.files?.[0]); e.target.value = ""; }} />
+          </label>
+        </div>
+      </Field>
 
       <Field label="Description" error={errors.description?.message}><Textarea className="min-h-24" aria-invalid={!!errors.description} {...register("description")} /></Field>
       <Field label="Highlights" hint="Up to 3 short lines (one per line), shown on the product page."><Textarea className="min-h-20" placeholder={"Soft pure-cotton fabric\nHand-block printed\nComes with dupatta"} {...register("highlights")} /></Field>

@@ -8,7 +8,7 @@ import { toProduct, unitsOf } from "./repo";
 import { parseSize } from "./size-variant";
 import type { AdminCart, CardProduct, CartLine, Customer, Order, Product } from "./types";
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+
 type Doc = Record<string, any>;
 const iso = (d: unknown) => (d ? new Date(d as string).toISOString() : new Date().toISOString());
 const id = (v: unknown) => String((v as Doc)?._id ?? v);
@@ -21,7 +21,7 @@ export const toCardProduct = (d: Doc): CardProduct => {
 export function toOrder(d: Doc): Order {
   return {
     id: id(d), orderNumber: d.orderNumber, userId: id(d.user),
-    customer: { name: d.customer?.name ?? "", email: d.customer?.email ?? "", phone: d.customer?.phone ?? "" },
+    customer: { name: (d.customer?.name ?? "").toUpperCase(), email: d.customer?.email ?? "", phone: d.customer?.phone ?? "" },
     items: (d.items ?? []).map((i: Doc) => ({ productId: id(i.product), size: i.size || undefined, color: i.color || undefined, slug: i.slug, name: i.name, brand: i.brand, price: i.price, quantity: i.quantity, image: i.image || undefined, art: i.art, returnable: i.returnable !== false, exchangeable: i.exchangeable !== false })),
     subtotal: d.subtotal, shipping: d.shipping, total: d.total,
     address: { name: d.address?.name ?? "", phone: d.address?.phone ?? "", line1: d.address?.line1 ?? "", line2: d.address?.line2 || undefined, city: d.address?.city ?? "", state: d.address?.state ?? "", pincode: d.address?.pincode ?? "" },
@@ -109,7 +109,7 @@ export async function getAdminCarts(): Promise<AdminCart[]> {
       return {
         userId: id(c.user),
         customer: {
-          name: c.user.name, email: c.user.email, phone: c.user.phone, guest: !!c.user.guest, joined: iso(c.user.createdAt), wallet: c.user.walletBalance || 0,
+          name: (c.user.name ?? "").toUpperCase(), email: c.user.email, phone: c.user.phone, guest: !!c.user.guest, joined: iso(c.user.createdAt), wallet: c.user.walletBalance || 0,
           orders: h?.orders ?? 0, spent: h?.spent ?? 0, lastOrderAt: h?.lastOrderAt ? iso(h.lastOrderAt) : undefined,
           address: a ? { name: a.name, phone: a.phone, line1: a.line1, line2: a.line2 || undefined, city: a.city, state: a.state, pincode: a.pincode } : undefined,
         },
@@ -129,7 +129,7 @@ export async function getCustomers(): Promise<Customer[]> {
   const stats = new Map<string, { orders: number; spent: number }>((orders as Doc[]).map((o) => [String(o._id), { orders: o.orders, spent: o.spent }]));
   const withCart = new Set((carts as Doc[]).map((c) => String(c.user)));
   return (users as Doc[]).map((u) => ({
-    id: id(u), name: u.name, email: u.email, phone: u.phone, createdAt: iso(u.createdAt),
+    id: id(u), name: (u.name ?? "").toUpperCase(), email: u.email, phone: u.phone, createdAt: iso(u.createdAt),
     orders: stats.get(id(u))?.orders ?? 0, spent: stats.get(id(u))?.spent ?? 0, carts: withCart.has(id(u)) ? 1 : 0, wallet: u.walletBalance ?? 0,
   }));
 }
