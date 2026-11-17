@@ -10,7 +10,7 @@ const iso = (d: unknown) => (d ? new Date(d as string | number | Date).toISOStri
 export function toReturn(d: Doc): ReturnRequest {
   return {
     id: String(d._id), number: d.number, orderId: String(d.order), orderNumber: d.orderNumber ?? "", userId: String(d.user),
-    customer: { name: d.customer?.name ?? "", email: d.customer?.email ?? "", phone: d.customer?.phone ?? "" },
+    customer: { name: (d.customer?.name ?? "").toUpperCase(), email: d.customer?.email ?? "", phone: d.customer?.phone ?? "" },
     type: d.type, reason: d.reason, comment: d.comment || undefined, photos: d.photos ?? [],
     items: (d.items ?? []).map((i: Doc) => ({ index: i.index, productId: String(i.product), slug: i.slug ?? "", name: i.name, size: i.size || undefined, color: i.color || undefined, price: i.price, quantity: i.quantity, image: i.image || undefined, art: i.art })),
     exchangeTo: d.exchangeTo?.size || d.exchangeTo?.color ? { size: d.exchangeTo.size || undefined, color: d.exchangeTo.color || undefined } : undefined,
