@@ -2,7 +2,7 @@
 import * as React from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { BarChart3, Bell, ShieldCheck, GalleryHorizontal, ImageIcon, Inbox, SlidersHorizontal, Undo2, Shirt, LayoutDashboard, Megaphone, Menu, Settings, Headphones, ExternalLink, ShoppingBag, ShoppingCart, Users, Search, GripVertical, Ruler, LayoutGrid, Clapperboard } from "lucide-react";
+import { BarChart3, Bell, ShieldCheck, GalleryHorizontal, ImageIcon, Inbox, SlidersHorizontal, Undo2, Shirt, LayoutDashboard, Megaphone, Menu, Settings, Headphones, ExternalLink, ShoppingBag, ShoppingCart, Users, Search, GripVertical, Ruler, LayoutGrid, Clapperboard, Star } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Drawer } from "@/components/ui/drawer";
 import { LogoMark } from "@/components/ui/icons";
@@ -21,9 +21,9 @@ const WEBSITE_URL = (process.env.NEXT_PUBLIC_SITE_URL ?? "").replace(/\/$/, "") 
 function Logo() {
   return (
     <Link href="/admin" aria-label={`${brandName} admin home`} className="flex items-center gap-2.5">
-      <LogoMark className="h-10 w-12 shrink-0" />
-      <span>
-        <span className="block text-[1.25rem] font-extrabold leading-tight tracking-tight text-ink">{brandName}</span>
+      <LogoMark className="h-9 w-11 shrink-0 sm:h-10 sm:w-12" />
+      <span className="hidden min-[26rem]:block">
+        <span className="block whitespace-nowrap text-[1.25rem] font-extrabold leading-tight tracking-tight text-ink">{brandName}</span>
         <span className="hidden whitespace-nowrap text-[11px] font-medium uppercase tracking-wider text-ink/40 sm:block">Admin Dashboard</span>
       </span>
     </Link>
@@ -49,6 +49,7 @@ const sections: { title: string; items: NavItem[] }[] = [
       { label: "Carts", href: "/admin/carts", Icon: ShoppingCart, badge: "carts" },
       { label: "Customers", href: "/admin/customers", Icon: Users },
       { label: "Enquiries", href: "/admin/enquiries", Icon: Inbox, badge: "enquiries" },
+      { label: "Reviews", href: "/admin/reviews", Icon: Star, badge: "reviews" },
     ],
   },
   {
@@ -154,7 +155,7 @@ export function AdminShell({ children, admin }: { children: React.ReactNode; adm
   const [palette, setPalette] = React.useState(false);
   const badges = useAdminBadges(pathname);
   const { sections: menu_, move } = useNavOrder(sections);
-  const anyNew = badges.orders + badges.carts + badges.enquiries > 0;
+  const anyNew = badges.orders + badges.carts + badges.enquiries + badges.returns + badges.reviews > 0;
 
   const logout = async () => {
     try { await postJson("/api/admin/logout", {}); } catch {}
@@ -184,11 +185,11 @@ export function AdminShell({ children, admin }: { children: React.ReactNode; adm
 
       <div className="min-w-0">
         <header className="sticky top-0 z-40 flex h-16 items-center justify-between gap-3 border-b border-line bg-card px-4 backdrop-blur sm:px-6 lg:px-8">
-          <div className="min-w-0">
+          <div className="min-w-0 shrink-0 lg:shrink">
             <div className="lg:hidden"><Logo /></div>
             <p className="hidden items-center gap-2 truncate text-sm font-semibold text-ink lg:flex"><span className="grid h-8 w-8 place-items-center rounded-sm bg-primary/[0.08] text-primary"><ShieldCheck className="h-[18px] w-[18px]" /></span>Admin panel</p>
           </div>
-          <div className="flex items-center gap-1.5">
+          <div className="flex items-center gap-0.5 sm:gap-1.5">
             <button
               type="button"
               onClick={() => setPalette(true)}
@@ -200,7 +201,7 @@ export function AdminShell({ children, admin }: { children: React.ReactNode; adm
               <kbd className="ml-4 hidden rounded-sm border border-line px-1.5 text-[11px] sm:inline">Ctrl K</kbd>
             </button>
             <NotificationBell />
-            <ThemeToggle />
+            <ThemeToggle className="hidden sm:flex" />
             <AdminAccountMenu name={admin.name} email={admin.email} onLogout={logout} />
             <button onClick={() => setMenu(true)} aria-label="Open admin menu" className="relative flex h-11 w-11 items-center justify-center rounded-sm hover:bg-surface lg:hidden">
               <Menu className="h-6 w-6" />

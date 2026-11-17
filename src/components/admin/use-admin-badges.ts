@@ -6,6 +6,7 @@ const SECTIONS = [
   { key: "carts", href: "/admin/carts" },
   { key: "enquiries", href: "/admin/enquiries" },
   { key: "returns", href: "/admin/returns" },
+  { key: "reviews", href: "/admin/reviews" },
 ] as const;
 
 export type BadgeKey = (typeof SECTIONS)[number]["key"];
@@ -22,7 +23,7 @@ const isOpen = (path: string, href: string) => path === href || path.startsWith(
  * Opening a page (or being on it when something arrives) counts as seeing it. First visit on a browser starts from zero.
  */
 export function useAdminBadges(pathname: string): Badges {
-  const [counts, setCounts] = React.useState<Badges>({ orders: 0, carts: 0, enquiries: 0, returns: 0 });
+  const [counts, setCounts] = React.useState<Badges>({ orders: 0, carts: 0, enquiries: 0, returns: 0, reviews: 0 });
 
   const poll = React.useCallback(async () => {
     if (document.visibilityState !== "visible") return;
@@ -32,7 +33,7 @@ export function useAdminBadges(pathname: string): Badges {
       const r = await fetch(`/api/admin/badges?${params}`, { cache: "no-store" });
       if (!r.ok) return;
       const { now, counts: next } = (await r.json()) as { now: number; counts: Badges };
-      const out: Badges = { orders: next.orders ?? 0, carts: next.carts ?? 0, enquiries: next.enquiries ?? 0, returns: next.returns ?? 0 };
+      const out: Badges = { orders: next.orders ?? 0, carts: next.carts ?? 0, enquiries: next.enquiries ?? 0, returns: next.returns ?? 0, reviews: next.reviews ?? 0 };
       for (const s of SECTIONS) {
         if (isOpen(pathname, s.href) || read(s.key) === null) { write(s.key, now); out[s.key] = 0; }
       }
