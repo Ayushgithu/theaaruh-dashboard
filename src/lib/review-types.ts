@@ -13,6 +13,7 @@ export type AdminReview = {
   fit: "" | "small" | "right" | "large";
   sizeBought: string;
   photos: string[];
+  avatar: string;
   verified: boolean;
   status: ReviewStatus;
   featured: boolean;

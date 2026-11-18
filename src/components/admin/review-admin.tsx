@@ -111,6 +111,10 @@ export function ReviewAdmin({ initial }: { initial: AdminReview[] }) {
             <li key={r.id} className="rounded-sm bg-card p-4 shadow-card ring-1 ring-line sm:p-5">
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <div className="flex min-w-0 items-center gap-3">
+                  {r.avatar
+                    // eslint-disable-next-line @next/next/no-img-element
+                    ? <img src={r.avatar.replace("/image/upload/", "/image/upload/f_auto,q_auto,w_96,h_96,c_fill,g_face/")} alt="" title="Reviewer's own photo" className="h-12 w-12 shrink-0 rounded-full object-cover ring-2 ring-primary/30" />
+                    : null}
                   {r.productImage
                     // eslint-disable-next-line @next/next/no-img-element
                     ? <img src={r.productImage} alt="" className="h-14 w-12 shrink-0 rounded-md object-cover" />

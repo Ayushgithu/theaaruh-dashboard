@@ -37,6 +37,7 @@ const OrderSchema = new Schema(
     timeline: [new Schema({ status: String, at: { type: Date, default: Date.now }, note: String }, { _id: false })],
     expiresAt: Date, // unpaid online orders release their reserved stock after this time
     stockReleased: { type: Boolean, default: false },
+    reviewRequest: new Schema({ at: Date, via: { type: String, enum: ["email", "whatsapp", "auto"] } }, { _id: false }), // when we asked the customer for a review
   },
   { timestamps: true },
 );

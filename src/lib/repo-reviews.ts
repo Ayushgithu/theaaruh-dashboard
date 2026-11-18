@@ -28,6 +28,7 @@ export async function getAdminReviews(): Promise<AdminReview[]> {
       fit: d.fit ?? "",
       sizeBought: d.sizeBought ?? "",
       photos: d.photos ?? [],
+      avatar: d.avatar ?? "",
       verified: !!d.verified,
       status: d.status,
       featured: !!d.featured,

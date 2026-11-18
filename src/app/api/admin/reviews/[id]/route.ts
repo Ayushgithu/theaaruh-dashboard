@@ -34,7 +34,7 @@ export const PUT = adminRoute(async (req, { params }) => {
 
 export const DELETE = adminRoute(async (_req, { params }) => {
   const doc = await load((await params).id);
-  const photos: string[] = doc.photos ?? [];
+  const photos: string[] = [...(doc.photos ?? []), ...(doc.avatar ? [doc.avatar] : [])];
   const product = doc.product;
   await doc.deleteOne();
   await recalcRating(product);
