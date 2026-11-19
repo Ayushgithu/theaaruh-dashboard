@@ -174,6 +174,7 @@ export function OrdersAdmin({ initial, shiprocket = false }: { initial: Order[];
               </ul>
               <dl className="ml-auto mt-3 w-full max-w-xs space-y-1 text-sm">
                 <div className="flex justify-between"><dt>Subtotal</dt><dd>{formatPrice(open.subtotal)}</dd></div>
+                {open.coupon && <div className="flex justify-between text-emerald-700"><dt>Coupon ({open.coupon.code})</dt><dd>{open.discount ? `−${formatPrice(open.discount)}` : "Free delivery"}</dd></div>}
                 <div className="flex justify-between"><dt>Delivery</dt><dd>{open.shipping ? formatPrice(open.shipping) : "Free"}</dd></div>
                 <div className="flex justify-between border-t border-line pt-1.5 text-base font-bold text-ink"><dt>Total</dt><dd>{formatPrice(open.total)}</dd></div>
               </dl>

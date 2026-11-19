@@ -61,6 +61,7 @@ export default async function PrintOrdersPage({ searchParams }: { searchParams: 
               </table></div>
               <dl className="ml-auto mt-3 w-60 space-y-1 text-sm">
                 <div className="flex justify-between"><dt>Subtotal</dt><dd>{formatPrice(o.subtotal)}</dd></div>
+                {o.coupon && <div className="flex justify-between"><dt>Coupon ({o.coupon.code})</dt><dd>{o.discount ? `−${formatPrice(o.discount)}` : "Free delivery"}</dd></div>}
                 <div className="flex justify-between"><dt>Delivery</dt><dd>{o.shipping ? formatPrice(o.shipping) : "Free"}</dd></div>
                 {(o.walletUsed ?? 0) > 0 && <div className="flex justify-between"><dt>Wallet credit</dt><dd>−{formatPrice(o.walletUsed!)}</dd></div>}
                 <div className="flex justify-between border-t border-ink pt-1 text-base font-bold"><dt>Total</dt><dd>{formatPrice(o.total)}</dd></div>
