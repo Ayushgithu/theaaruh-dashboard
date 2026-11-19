@@ -2,7 +2,7 @@
 import * as React from "react";
 import { Check, Copy, EyeOff, ImageOff, Pencil, Plus, Search, Tag, Trash2 } from "lucide-react";
 import { toast } from "sonner";
-import type { AdminCoupon, CouponScope, CouponType, PickCollection } from "@/lib/coupon-types";
+import type { AdminCoupon, CouponAudience, CouponScope, CouponType, PayWith, PickCollection, PickCustomer } from "@/lib/coupon-types";
 import type { PickProduct } from "@/lib/collection-types";
 import { postJson } from "@/lib/api";
 import { cn, formatPrice } from "@/lib/utils";
@@ -14,7 +14,7 @@ import { AdminPageHeader } from "./shell";
 type Draft = {
   code: string; title: string; description: string; type: CouponType; value: number; maxDiscount: number; minOrder: number;
   startsAt: string | null; endsAt: string | null; usageLimit: number; perCustomer: number; firstOrderOnly: boolean;
-  scope: CouponScope; products: string[]; collections: string[]; active: boolean; visible: boolean;
+  scope: CouponScope; products: string[]; collections: string[]; excludeSale: boolean; payWith: PayWith; audience: CouponAudience; customers: string[]; active: boolean; visible: boolean;
 };
 
 const TYPES: { v: CouponType; label: string }[] = [
@@ -49,7 +49,7 @@ const stateOf = (c: AdminCoupon): State => {
 
 const dateText = (iso?: string) => (iso ? new Date(iso).toLocaleString("en-IN", { day: "numeric", month: "short", year: "numeric", hour: "numeric", minute: "2-digit" }) : "");
 
-function CouponForm({ item, products, collections, onSave, onCancel }: { item: AdminCoupon | null; products: PickProduct[]; collections: PickCollection[]; onSave: (d: Draft) => Promise<boolean>; onCancel: () => void }) {
+function CouponForm({ item, products, collections, customers, onSave, onCancel }: { item: AdminCoupon | null; products: PickProduct[]; collections: PickCollection[]; customers: PickCustomer[]; onSave: (d: Draft) => Promise<boolean>; onCancel: () => void }) {
   const [code, setCode] = React.useState(item?.code ?? "");
   const [title, setTitle] = React.useState(item?.title ?? "");
   const [description, setDescription] = React.useState(item?.description ?? "");
@@ -65,6 +65,11 @@ function CouponForm({ item, products, collections, onSave, onCancel }: { item: A
   const [scope, setScope] = React.useState<CouponScope>(item?.scope ?? "all");
   const [pickedProducts, setPickedProducts] = React.useState<string[]>(item?.products ?? []);
   const [pickedCollections, setPickedCollections] = React.useState<string[]>(item?.collections ?? []);
+  const [excludeSale, setExcludeSale] = React.useState(item?.excludeSale ?? false);
+  const [payWith, setPayWith] = React.useState<PayWith>(item?.payWith ?? "any");
+  const [audience, setAudience] = React.useState<CouponAudience>(item?.audience ?? "everyone");
+  const [pickedCustomers, setPickedCustomers] = React.useState<string[]>(item?.customers ?? []);
+  const [cq, setCq] = React.useState("");
   const [active, setActive] = React.useState(item?.active ?? true);
   const [visible, setVisible] = React.useState(item?.visible ?? true);
   const [q, setQ] = React.useState("");
@@ -75,6 +80,10 @@ function CouponForm({ item, products, collections, onSave, onCancel }: { item: A
     const s = q.trim().toLowerCase();
     return s ? products.filter((p) => p.name.toLowerCase().includes(s) || p.category.toLowerCase().includes(s)) : products;
   }, [products, q]);
+  const shownCustomers = React.useMemo(() => {
+    const s = cq.trim().toLowerCase();
+    return s ? customers.filter((c) => `${c.name} ${c.email} ${c.phone}`.toLowerCase().includes(s)) : customers;
+  }, [customers, cq]);
   const toggle = (list: string[], set: (v: string[]) => void, id: string) => set(list.includes(id) ? list.filter((x) => x !== id) : [...list, id]);
 
   const submit = async (e: React.FormEvent) => {
@@ -85,7 +94,8 @@ function CouponForm({ item, products, collections, onSave, onCancel }: { item: A
       code: code.trim().toUpperCase(), title: title.trim(), description: description.trim(), type,
       value: type === "shipping" ? 0 : Number(value) || 0, maxDiscount: type === "percent" ? Number(maxDiscount) || 0 : 0, minOrder: Number(minOrder) || 0,
       startsAt: toIso(startsAt), endsAt: toIso(endsAt), usageLimit: Number(usageLimit) || 0, perCustomer: Number(perCustomer) || 0, firstOrderOnly,
-      scope, products: scope === "products" ? pickedProducts : [], collections: scope === "collections" ? pickedCollections : [], active, visible,
+      scope, products: scope === "products" ? pickedProducts : [], collections: scope === "collections" ? pickedCollections : [],
+      excludeSale, payWith, audience, customers: audience === "selected" ? pickedCustomers : [], active, visible,
     });
     setBusy(false);
     if (!ok) setError("Please check the highlighted details and try again.");
@@ -117,6 +127,11 @@ function CouponForm({ item, products, collections, onSave, onCancel }: { item: A
           </div>
         )}
         <Field label="Minimum order value (₹)" hint="Optional. The coupon works only when the items in the bag add up to at least this. Empty = any amount."><Input type="number" inputMode="numeric" min={0} value={minOrder} onChange={(e) => setMinOrder(e.target.value)} placeholder="e.g. 999" /></Field>
+        <Field label="Payment way" hint="Give the discount only when the customer pays this way. e.g. “Online payment only” to push UPI and reduce COD."><Select value={payWith} onChange={(e) => setPayWith(e.target.value as PayWith)}>
+          <option value="any">Any payment way</option>
+          <option value="online">Only online payment (UPI / card)</option>
+          <option value="cod">Only Cash on Delivery</option>
+        </Select></Field>
       </div>
 
       <div className={section}>
@@ -161,17 +176,53 @@ function CouponForm({ item, products, collections, onSave, onCancel }: { item: A
       </div>
 
       <div className={section}>
+        <p className={heading}>Items already on sale</p>
+        <div className="flex items-center justify-between gap-4 rounded-sm bg-surface p-3">
+          <div><p className="text-sm font-semibold text-ink">Not on flash-sale items</p><p className="text-xs">On: products with a running flash sale get no coupon discount, so there is no double discount.</p></div>
+          <Switch checked={excludeSale} onChange={setExcludeSale} label="Not on flash-sale items" />
+        </div>
+      </div>
+
+      <div className={section}>
         <p className={heading}>4. When and how many times</p>
         <div className="grid gap-4 sm:grid-cols-2">
           <Field label="Starts (optional)" hint="Empty = starts right now."><Input type="datetime-local" value={startsAt} onChange={(e) => setStartsAt(e.target.value)} /></Field>
           <Field label="Ends (optional)" hint="Empty = never ends. It switches off by itself."><Input type="datetime-local" value={endsAt} onChange={(e) => setEndsAt(e.target.value)} /></Field>
           <Field label="Total uses allowed" hint="Empty = unlimited. e.g. 100 = first 100 orders."><Input type="number" inputMode="numeric" min={0} value={usageLimit} onChange={(e) => setUsageLimit(e.target.value)} placeholder="Unlimited" /></Field>
-          <Field label="Uses per customer" hint="Empty = unlimited. e.g. 1 = once per customer."><Input type="number" inputMode="numeric" min={0} value={perCustomer} onChange={(e) => setPerCustomer(e.target.value)} placeholder="Unlimited" /></Field>
+          <Field label="Uses per customer" hint="Empty = unlimited. e.g. 1 = once per customer. The same phone number or delivery address is counted too, so a second account cannot reuse it."><Input type="number" inputMode="numeric" min={0} value={perCustomer} onChange={(e) => setPerCustomer(e.target.value)} placeholder="Unlimited" /></Field>
         </div>
         <div className="flex items-center justify-between gap-4 rounded-sm bg-surface p-3">
           <div><p className="text-sm font-semibold text-ink">New customers only</p><p className="text-xs">Works only on a customer&apos;s first order.</p></div>
           <Switch checked={firstOrderOnly} onChange={setFirstOrderOnly} label="First order only" />
         </div>
+      </div>
+
+      <div className={section}>
+        <p className={heading}>Who can use it</p>
+        <Field label="Customers"><Select value={audience} onChange={(e) => setAudience(e.target.value as CouponAudience)}>
+          <option value="everyone">Everyone</option>
+          <option value="selected">Only chosen customers (VIP, old customers…)</option>
+        </Select></Field>
+        {audience === "selected" && (
+          <div>
+            <p className="mb-2 text-xs"><strong className="text-ink">{pickedCustomers.length}</strong> selected. Only they can see and use this coupon.</p>
+            <div className="relative mb-3"><Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2" /><Input aria-label="Search customers" className="pl-9" placeholder="Search by name, email or phone…" value={cq} onChange={(e) => setCq(e.target.value)} /></div>
+            <ul className="max-h-72 divide-y divide-line overflow-y-auto rounded-sm border border-line">
+              {shownCustomers.length === 0 && <li className="p-6 text-center text-sm">No customers match.</li>}
+              {shownCustomers.map((c) => {
+                const on = pickedCustomers.includes(c.id);
+                return (
+                  <li key={c.id}>
+                    <button type="button" aria-pressed={on} onClick={() => toggle(pickedCustomers, setPickedCustomers, c.id)} className={cn("flex w-full items-center gap-3 p-3 text-left transition", on ? "bg-primary-faint" : "hover:bg-surface")}>
+                      <span className={cn("flex h-5 w-5 shrink-0 items-center justify-center rounded border-2", on ? "border-primary bg-primary text-white" : "border-line")}>{on && <Check className="h-3.5 w-3.5" strokeWidth={3} />}</span>
+                      <span className="min-w-0"><span className="block truncate text-sm font-semibold text-ink">{c.name || "Customer"}</span><span className="block truncate text-xs">{c.email}{c.phone ? ` · ${c.phone}` : ""}</span></span>
+                    </button>
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+        )}
       </div>
 
       <div className={section}>
@@ -195,7 +246,7 @@ function CouponForm({ item, products, collections, onSave, onCancel }: { item: A
   );
 }
 
-export function CouponAdmin({ initial, products, collections }: { initial: AdminCoupon[]; products: PickProduct[]; collections: PickCollection[] }) {
+export function CouponAdmin({ initial, products, collections, customers }: { initial: AdminCoupon[]; products: PickProduct[]; collections: PickCollection[]; customers: PickCustomer[] }) {
   const [items, setItems] = React.useState(initial);
   React.useEffect(() => setItems(initial), [initial]);
   const [editing, setEditing] = React.useState<AdminCoupon | "new" | null>(null);
@@ -279,6 +330,10 @@ export function CouponAdmin({ initial, products, collections }: { initial: Admin
                     <p className="mt-1 text-xs">
                       {scopeText}
                       {c.firstOrderOnly && " · New customers only"}
+                      {c.audience === "selected" && ` · Only ${c.customers.length} chosen customer${c.customers.length === 1 ? "" : "s"}`}
+                      {c.payWith === "online" && " · Online payment only"}
+                      {c.payWith === "cod" && " · Cash on Delivery only"}
+                      {c.excludeSale && " · Not on sale items"}
                       {c.perCustomer > 0 && ` · ${c.perCustomer} per customer`}
                       {c.startsAt && ` · From ${dateText(c.startsAt)}`}
                       {c.endsAt && ` · Until ${dateText(c.endsAt)}`}
@@ -304,7 +359,7 @@ export function CouponAdmin({ initial, products, collections }: { initial: Admin
       )}
 
       <Dialog open={editing !== null} onClose={() => setEditing(null)} title={editing === "new" ? "Make a coupon" : "Edit coupon"} wide>
-        {editing !== null && <CouponForm key={editing === "new" ? "new" : editing.id} item={editing === "new" ? null : editing} products={products} collections={collections} onSave={save} onCancel={() => setEditing(null)} />}
+        {editing !== null && <CouponForm key={editing === "new" ? "new" : editing.id} item={editing === "new" ? null : editing} products={products} collections={collections} customers={customers} onSave={save} onCancel={() => setEditing(null)} />}
       </Dialog>
       <Dialog open={!!deleting} onClose={() => setDeleting(null)} title="Delete this coupon?"
         footer={<><Button variant="outline" onClick={() => setDeleting(null)}>Keep it</Button><Button variant="danger" onClick={remove}>Delete coupon</Button></>}>

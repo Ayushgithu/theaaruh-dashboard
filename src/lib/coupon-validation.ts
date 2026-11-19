@@ -19,6 +19,10 @@ export const couponInput = z.object({
   scope: z.enum(["all", "products", "collections"]).default("all"),
   products: z.array(objId).max(1000).default([]),
   collections: z.array(objId).max(200).default([]),
+  excludeSale: z.boolean().default(false),
+  payWith: z.enum(["any", "online", "cod"]).default("any"),
+  audience: z.enum(["everyone", "selected"]).default("everyone"),
+  customers: z.array(objId).max(2000).default([]),
   active: z.boolean().default(true),
   visible: z.boolean().default(true),
 }).superRefine((v, ctx) => {
@@ -27,5 +31,6 @@ export const couponInput = z.object({
   if (v.type === "flat" && v.value < 1) bad("Enter the rupees to take off", "value");
   if (v.scope === "products" && !v.products.length) bad("Pick at least one product, or choose “All products”", "products");
   if (v.scope === "collections" && !v.collections.length) bad("Pick at least one collection, or choose “All products”", "collections");
+  if (v.audience === "selected" && !v.customers.length) bad("Pick at least one customer, or choose “Everyone”", "customers");
   if (v.startsAt && v.endsAt && +v.endsAt <= +v.startsAt) bad("The end must be after the start", "endsAt");
 });
