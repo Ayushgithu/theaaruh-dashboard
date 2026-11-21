@@ -18,9 +18,9 @@ beforeEach(() => vi.mocked(getSession).mockResolvedValue({ id: "a1", email: "o@s
 describe("POST /api/admin/announcements (create)", () => {
   it("creates a message and returns it", async () => {
     Model.create.mockImplementation(async (d: object) => ({ toObject: () => ({ _id: ID, ...d }) }));
-    const res = await POST(jsonReq("/api/admin/announcements", "POST", { text: "Free delivery on laptops", href: "/laptops", active: true }), ctx());
+    const res = await POST(jsonReq("/api/admin/announcements", "POST", { text: "Free delivery on suit sets", href: "/shop", active: true }), ctx());
     expect(res.status).toBe(201);
-    expect(await res.json()).toEqual({ id: ID, text: "Free delivery on laptops", href: "/laptops", active: true });
+    expect(await res.json()).toEqual({ id: ID, text: "Free delivery on suit sets", href: "/shop", active: true });
   });
   it("400 for text that is too short; nothing saved", async () => {
     const res = await POST(jsonReq("/api/admin/announcements", "POST", { text: "ab", active: true }), ctx());

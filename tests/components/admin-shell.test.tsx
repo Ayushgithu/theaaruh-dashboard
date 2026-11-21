@@ -12,7 +12,7 @@ const admin = { name: "Store owner", email: "owner@shop.com" };
 describe("<AdminShell />", () => {
   it("renders the sidebar links and the page content", () => {
     render(<AdminShell admin={admin}><p>Page body</p></AdminShell>);
-    for (const name of ["Dashboard", "Orders", "Carts", "Customers", "Clothing", "Accessories", "Top bar", "Banners", "Enquiries", "Settings"]) {
+    for (const name of ["Dashboard", "Orders", "Carts", "Customers", "Clothing", "Top bar", "Banners", "Enquiries", "Settings"]) {
       expect(screen.getAllByRole("link", { name })[0]).toBeInTheDocument();
     }
     expect(screen.getByText("Page body")).toBeInTheDocument();

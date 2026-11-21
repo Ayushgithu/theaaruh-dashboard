@@ -27,16 +27,16 @@ describe("POST /api/admin/products", () => {
     const res = await POST(jsonReq("/api/admin/products", "POST", validProduct), ctx());
     expect(res.status).toBe(201);
     const saved = model.create.mock.calls[0][0];
-    expect(saved).toMatchObject({ slug: "dell-latitude-5420", stock: "low", stockCount: 2, views: 0, featured: true, images: [URL_A], tags: ["business"] });
-    expect(saved.art).toMatchObject({ kind: "laptop" });
+    expect(saved).toMatchObject({ slug: "maroon-anarkali-suit", stock: "low", stockCount: 2, views: 0, featured: true, images: [URL_A], tags: ["festive"] });
+    expect(saved.art).toMatchObject({ kind: "cloth" });
     const body = await res.json();
-    expect(body).toMatchObject({ id: ID, name: "Dell Latitude 5420", price: 32999, stock: "low", slug: "dell-latitude-5420" });
+    expect(body).toMatchObject({ id: ID, name: "Maroon Anarkali Suit", price: 32999, stock: "low", slug: "maroon-anarkali-suit" });
   });
 
   it("gives a unique slug when the name already exists", async () => {
     model.exists.mockResolvedValueOnce({ _id: "x" }).mockResolvedValue(null);
     await POST(jsonReq("/api/admin/products", "POST", validProduct), ctx());
-    expect(model.create.mock.calls[0][0].slug).toBe("dell-latitude-5420-2");
+    expect(model.create.mock.calls[0][0].slug).toBe("maroon-anarkali-suit-2");
   });
 
   it("0 units means sold out; units are stored as the quantity on hand", async () => {
@@ -69,7 +69,7 @@ describe("POST /api/admin/products", () => {
     expect(model.create.mock.calls[0][0]).toMatchObject({ quantity: 0, stock: "out" });
   });
 
-  it("clothing needs units or sizes; brand and warranty are optional", async () => {
+  it("clothing needs units or sizes; brand is optional", async () => {
     const bad = await POST(jsonReq("/api/admin/products", "POST", cloth), ctx());
     expect(bad.status).toBe(400);
     const ok = await POST(jsonReq("/api/admin/products", "POST", { ...cloth, units: 4 }), ctx());
@@ -103,7 +103,7 @@ describe("POST /api/admin/products", () => {
 });
 
 describe("PUT /api/admin/products/:id", () => {
-  const doc = () => ({ images: [URL_A, URL_B], set: vi.fn(), save: vi.fn(), toObject: () => ({ _id: ID, ...validProduct, slug: "dell-latitude-5420", stock: "low" }) });
+  const doc = () => ({ images: [URL_A, URL_B], set: vi.fn(), save: vi.fn(), toObject: () => ({ _id: ID, ...validProduct, slug: "maroon-anarkali-suit", stock: "low" }) });
 
   it("updates fields and deletes photos that were removed", async () => {
     const d = doc();

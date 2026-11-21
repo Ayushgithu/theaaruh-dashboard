@@ -7,7 +7,7 @@ export const dynamic = "force-dynamic";
 
 export interface AdminNotification {
   id: string;
-  kind: "order" | "sell" | "enquiry";
+  kind: "order" | "enquiry";
   title: string;
   body: string;
   href: string;
@@ -17,7 +17,7 @@ export interface AdminNotification {
 const DAYS = 7;
 const rupees = (n: number) => `₹${Math.round(n).toLocaleString("en-IN")}`;
 
-/** Latest store activity for the dashboard bell: new orders, sell-your-laptop requests, other enquiries. */
+/** Latest store activity for the dashboard bell: new orders and customer enquiries. */
 export const GET = adminRoute(async () => {
   await connectDB();
   const since = new Date(Date.now() - DAYS * 24 * 3600 * 1000);
@@ -42,17 +42,14 @@ export const GET = adminRoute(async () => {
       at: new Date(o.payment?.paidAt ?? o.createdAt).toISOString(),
     })),
 
-    ...(enquiries as any[]).map((e): AdminNotification => {
-      const sell = e.source === "Sell request";
-      return {
-        id: `enquiry:${e._id}`,
-        kind: sell ? "sell" : "enquiry",
-        title: sell ? "Custom request" : `New enquiry · ${e.source}`,
-        body: sell && e.sell ? `${e.name} · ${e.sell.brand} ${e.sell.model} · asks ${rupees(e.sell.expectedPrice)}` : `${e.name} · ${String(e.message ?? "").slice(0, 70)}`,
-        href: "/admin/enquiries",
-        at: new Date(e.createdAt).toISOString(),
-      };
-    }),
+    ...(enquiries as any[]).map((e): AdminNotification => ({
+      id: `enquiry:${e._id}`,
+      kind: "enquiry",
+      title: `New enquiry · ${e.source}`,
+      body: `${e.name} · ${String(e.message ?? "").slice(0, 70)}`,
+      href: "/admin/enquiries",
+      at: new Date(e.createdAt).toISOString(),
+    })),
   ].sort((a, b) => +new Date(b.at) - +new Date(a.at)).slice(0, 25);
 
   return Response.json({ items }, { headers: { "Cache-Control": "no-store" } });

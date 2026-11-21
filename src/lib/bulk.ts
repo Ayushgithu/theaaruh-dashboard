@@ -26,7 +26,7 @@ export function tableToRows(table: string[][]): RawRow[] {
 /** Small RFC-4180 CSV reader (quotes, commas and line breaks inside quotes). */
 export function parseCsv(text: string): string[][] {
   const out: string[][] = []; let row: string[] = []; let cur = ""; let q = false;
-  const t = text.replace(/^\uFEFF/, "");
+  const t = text.replace(/^﻿/, "");
   for (let i = 0; i < t.length; i++) {
     const c = t[i];
     if (q) { if (c === '"') { if (t[i + 1] === '"') { cur += '"'; i++; } else q = false; } else cur += c; }
@@ -53,14 +53,13 @@ export function parseColors(v: string | undefined) {
 
 /** One spreadsheet row → validated product input (or a readable error for that row). */
 export function rowToProduct(r: RawRow): { input: ReturnType<typeof productInput.parse>; error?: undefined } | { input?: undefined; error: string } {
-  const type = /^acc/i.test(r.type ?? "") ? "accessory" : "clothing";
-  const sizes = type === "clothing" ? parseSizes(r.sizes) : [];
+  const sizes = parseSizes(r.sizes);
   const parsed = productInput.safeParse({
-    type, name: r.name, category: r.category, price: r.price, mrp: r.mrp ? r.mrp : undefined, brand: "", condition: "New", warranty: "",
-    units: sizes.length ? undefined : r.units === undefined || r.units === "" ? (type === "accessory" ? undefined : undefined) : r.units,
+    type: "clothing", name: r.name, category: r.category, price: r.price, mrp: r.mrp ? r.mrp : undefined, brand: "",
+    units: sizes.length ? undefined : r.units === undefined || r.units === "" ? undefined : r.units,
     sizes, colors: parseColors(r.colors), fabric: r.fabric ?? "", fit: r.fit ?? "", occasion: r.occasion ?? "", washCare: r.washcare ?? "",
     badges: list(r.badges, /[,;|]/).slice(0, 5), featured: yes(r.featured, false), returnable: yes(r.returnable, true), exchangeable: yes(r.exchangeable, true),
-    videoUrl: r.video_url ?? "", highlights: list(r.highlights, /[|\n]/).slice(0, 3), description: r.description ?? "", tags: [], specs: {}, included: [], conditionNotes: [], images: [],
+    videoUrl: r.video_url ?? "", highlights: list(r.highlights, /[|\n]/).slice(0, 3), description: r.description ?? "", tags: [], specs: {}, images: [],
   });
   if (parsed.success) return { input: parsed.data };
   const i = parsed.error.issues[0];

@@ -5,7 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2, Plus, Star, X } from "lucide-react";
 import { toast } from "sonner";
 import { z } from "zod";
-import type { Product, ProductType } from "@/lib/types";
+import type { Product } from "@/lib/types";
 import { uploadImages, uploadVideo } from "@/lib/api";
 import { discountPct } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -31,21 +31,18 @@ const SIZE_PRESETS = ["XS", "S", "M", "L", "XL", "XXL", "XXXL", "Free Size"];
 const KIDS_PRESETS = ["0-6 Mo", "6-12 Mo", "1-2 Yr", "2-3 Yr", "3-4 Yr", "4-5 Yr", "5-6 Yr", "6-7 Yr", "7-8 Yr", "8-9 Yr", "9-10 Yr", "10-12 Yr", "12-14 Yr"];
 const BADGES = ["New", "Best Seller", "Trending", "Deal"];
 const COLLECTIONS = ["Suit Sets", "Sarees", "Co-ord Sets", "Dresses", "Kurtis", "Lehengas"];
-const ACCESSORY_CATEGORIES = ["Dupattas", "Jewellery", "Bags", "Footwear"];
 const lines = (t?: string) => (t ?? "").split("\n").map((x) => x.trim()).filter(Boolean);
 const isFutureDate = (value: string) => {
   const timestamp = new Date(value).getTime();
   return Number.isFinite(timestamp) && timestamp > Date.now();
 };
 
-export function ProductForm({ type, product, categories = [], onSave, onCancel }: {
-  type: ProductType;
+export function ProductForm({ product, categories = [], onSave, onCancel }: {
   product: Product | null;
   categories?: string[];
   onSave: (payload: Record<string, unknown>) => Promise<boolean>;
   onCancel: () => void;
 }) {
-  const clothing = type !== "accessory";
   const [featured, setFeatured] = React.useState(product?.featured ?? false);
   const [badges, setBadges] = React.useState<string[]>(product?.badges ?? []);
   const [sizes, setSizes] = React.useState<{ label: string; qty: string }[]>((product?.sizes ?? []).map((s) => ({ label: s.label, qty: String(s.qty) })));
@@ -70,12 +67,11 @@ export function ProductForm({ type, product, categories = [], onSave, onCancel }
   const [guides, setGuides] = React.useState<{ name: string; slug: string; active: boolean }[]>([]);
   const [guideSlugs, setGuideSlugs] = React.useState<string[]>(product?.sizeGuides ?? []);
   // which size pickers customers get: Women only (default), Kids only, or both (twinning set)
-  const showKids = clothing && guideSlugs.includes("kids");
-  const showWomen = clothing && (!showKids || guideSlugs.some((g) => g !== "kids"));
+  const showKids = guideSlugs.includes("kids");
+  const showWomen = (!showKids || guideSlugs.some((g) => g !== "kids"));
   React.useEffect(() => {
-    if (!clothing) return;
     fetch("/api/admin/size-guides").then((r) => (r.ok ? r.json() : null)).then((j) => { if (j?.guides) setGuides(j.guides); }).catch(() => {});
-  }, [clothing]);
+  }, []);
   const [specs, setSpecs] = React.useState<{ k: string; v: string }[]>(product ? Object.entries(product.specs).map(([k, v]) => ({ k, v })) : []);
   const [existing, setExisting] = React.useState<string[]>(product?.images ?? []);
   const [files, setFiles] = React.useState<File[]>([]);
@@ -99,7 +95,7 @@ export function ProductForm({ type, product, categories = [], onSave, onCancel }
   const mrp = Number(useWatch({ control, name: "mrp" }) || 0);
   const off = discountPct(price, mrp);
   const totalUnits = sizes.reduce((n, s) => n + (Number(s.qty) || 0), 0);
-  const cats = [...new Set([...categories, ...(clothing ? COLLECTIONS : ACCESSORY_CATEGORIES)])];
+  const cats = [...new Set([...categories, ...COLLECTIONS])];
 
   const toggleSize = (label: string) => setSizes((cur) => (cur.some((s) => s.label === label) ? cur.filter((s) => s.label !== label) : [...cur, { label, qty: "5" }]));
   const toggleKid = (label: string) => setKidSizes((cur) => (cur.some((s) => s.label === label) ? cur.filter((s) => s.label !== label) : [...cur, { label, extra: "0" }]));
@@ -117,7 +113,7 @@ export function ProductForm({ type, product, categories = [], onSave, onCancel }
   const submit = async (v: Values) => {
     const womenSizes = showWomen ? sizes : [];
     if (showKids && kidSizes.length === 0) { toast.error("Add at least one kid's size (or untick Kids in the size guide)"); return; }
-    if (clothing && womenSizes.length === 0 && !v.units) { setError("units", { message: "Add sizes with stock, or enter the units in stock" }); return; }
+    if (womenSizes.length === 0 && !v.units) { setError("units", { message: "Add sizes with stock, or enter the units in stock" }); return; }
     if (flashOn && (!Number(flashPrice) || Number(flashPrice) >= Number(v.price))) { toast.error("The flash price must be lower than the normal price"); return; }
     if (flashOn && (!flashEnds || !isFutureDate(flashEnds))) { toast.error("Choose a future end time for the flash sale"); return; }
     setBusy(true);
@@ -138,17 +134,17 @@ export function ProductForm({ type, product, categories = [], onSave, onCancel }
         colorPayload.push({ name: c.name.trim(), hex: c.hex, images: [...c.images, ...more] });
       }
       await onSave({
-        type, name: v.name, brand: "", category: v.category,
+        type: "clothing", name: v.name, brand: "", category: v.category,
         price: Number(v.price), mrp: v.mrp ? Number(v.mrp) : undefined,
-        condition: "New", units: clothing && womenSizes.length ? undefined : Number(v.units || 0), featured, tags: [], badges,
-        sizes: clothing ? womenSizes.map((s) => ({ label: s.label, qty: Number(s.qty) || 0 })) : [],
+        units: womenSizes.length ? undefined : Number(v.units || 0), featured, tags: [], badges,
+        sizes: womenSizes.map((s) => ({ label: s.label, qty: Number(s.qty) || 0 })),
         kidSizes: showKids ? kidSizes.map((k) => ({ label: k.label, extra: Number(k.extra) || 0 })) : [],
-        sizeGuides: clothing ? guideSlugs : [],
+        sizeGuides: guideSlugs,
         colors: colorPayload, videoUrl: videoUrl.trim(), returnable, exchangeable, flashPrice: flashOn ? Number(flashPrice) : undefined, flashEndsAt: flashOn ? new Date(flashEnds).toISOString() : undefined,
         fabric: v.fabric?.trim() ?? "", fit: v.fit?.trim() ?? "", occasion: v.occasion?.trim() ?? "", washCare: v.washCare?.trim() ?? "",
         specs: Object.fromEntries(specs.filter((s) => s.k.trim() && s.v.trim()).map((s) => [s.k.trim(), s.v.trim()])),
-        highlights: lines(v.highlights).slice(0, 3), included: [], conditionNotes: [],
-        description: v.description, warranty: "",
+        highlights: lines(v.highlights).slice(0, 3),
+        description: v.description,
         images: [...existing, ...uploaded],
       });
     } finally {
@@ -159,19 +155,19 @@ export function ProductForm({ type, product, categories = [], onSave, onCancel }
   return (
     <form onSubmit={handleSubmit(submit)} noValidate className="space-y-6">
       <div className="grid gap-4 sm:grid-cols-2">
-        <Field label="Name" error={errors.name?.message} className="sm:col-span-2"><Input aria-invalid={!!errors.name} placeholder={clothing ? "Maroon Anarkali Suit Set" : "Banarasi Dupatta"} {...register("name")} /></Field>
-        <Field label={clothing ? "Collection" : "Category"} htmlFor="category-input" error={errors.category?.message} hint={clothing ? "Customers shop by this, e.g. Suit Sets, Sarees. Pick one or type a new one." : "e.g. Dupattas, Jewellery, Bags"}>
+        <Field label="Name" error={errors.name?.message} className="sm:col-span-2"><Input aria-invalid={!!errors.name} placeholder="Maroon Anarkali Suit Set" {...register("name")} /></Field>
+        <Field label="Collection" htmlFor="category-input" error={errors.category?.message} hint="Customers shop by this, e.g. Suit Sets, Sarees. Pick one or type a new one.">
           <Input id="category-input" list="category-options" aria-invalid={!!errors.category} {...register("category")} />
           <datalist id="category-options">{cats.map((c) => <option key={c} value={c} />)}</datalist>
         </Field>
         <Field label="Selling price (₹)" error={errors.price?.message}><Input inputMode="numeric" aria-invalid={!!errors.price} {...register("price")} /></Field>
         <Field label="Original price / MRP (₹)" error={errors.mrp?.message} hint={off > 0 ? `Shown struck through with ${off}% off` : "Shown struck through with a % off"}><Input inputMode="numeric" {...register("mrp")} /></Field>
-        {!(clothing && showWomen && sizes.length > 0) && (
+        {!(showWomen && sizes.length > 0) && (
           <Field label="Units in stock" error={errors.units?.message} hint="0 = sold out · 1–3 shows as low stock · reduces automatically when customers buy"><Input inputMode="numeric" {...register("units")} /></Field>
         )}
       </div>
 
-      {clothing && guides.length > 0 && (
+      {guides.length > 0 && (
         <div className="rounded-sm border border-line p-4">
           <p className="text-sm font-semibold text-ink">Who is this product for? (size chart &amp; sizes)</p>
           <p className="mb-3 text-xs">Choose who this product is for. Women: women&apos;s sizes with stock. Kids: kids&apos; age sizes, each with an optional extra price. Both: a twinning set, customers pick both sizes. This also decides which size charts customers see.</p>
@@ -276,14 +272,12 @@ export function ProductForm({ type, product, categories = [], onSave, onCancel }
         <Button type="button" variant="soft" size="sm" className="mt-3" onClick={() => setColors((c) => [...c, { name: "", hex: "#8c1d40", images: [], files: [] }])}><Plus className="h-4 w-4" /> Add colour</Button>
       </fieldset>
 
-      {clothing && (
-        <div className="grid gap-4 sm:grid-cols-3">
-          <Field label="Fabric" hint="e.g. Pure cotton, Rayon, Georgette"><Input {...register("fabric")} /></Field>
-          <Field label="Fit" hint="e.g. Regular, Relaxed, A-line"><Input {...register("fit")} /></Field>
-          <Field label="Occasion" hint="Creates a “shop by occasion” page on the website — use the same spelling every time"><Input list="occasion-options" {...register("occasion")} /><datalist id="occasion-options">{["Festive", "Wedding", "Party", "Casual", "Daily wear", "Office", "Loungewear"].map((o) => <option key={o} value={o} />)}</datalist></Field>
-          <Field label="Wash care" className="sm:col-span-3" hint="e.g. Hand wash cold. Do not bleach. Dry in shade."><Input {...register("washCare")} /></Field>
-        </div>
-      )}
+      <div className="grid gap-4 sm:grid-cols-3">
+        <Field label="Fabric" hint="e.g. Pure cotton, Rayon, Georgette"><Input {...register("fabric")} /></Field>
+        <Field label="Fit" hint="e.g. Regular, Relaxed, A-line"><Input {...register("fit")} /></Field>
+        <Field label="Occasion" hint="Creates a “shop by occasion” page on the website — use the same spelling every time"><Input list="occasion-options" {...register("occasion")} /><datalist id="occasion-options">{["Festive", "Wedding", "Party", "Casual", "Daily wear", "Office", "Loungewear"].map((o) => <option key={o} value={o} />)}</datalist></Field>
+        <Field label="Wash care" className="sm:col-span-3" hint="e.g. Hand wash cold. Do not bleach. Dry in shade."><Input {...register("washCare")} /></Field>
+      </div>
 
       <div className="grid gap-3 sm:grid-cols-2">
         <div className="flex items-center justify-between gap-3 rounded-sm border border-line bg-surface p-4">
@@ -363,7 +357,7 @@ export function ProductForm({ type, product, categories = [], onSave, onCancel }
 
       <div className="flex flex-wrap justify-end gap-3 border-t border-line pt-5">
         <Button type="button" variant="outline" onClick={onCancel} disabled={busy}>Cancel</Button>
-        <Button type="submit" disabled={busy}>{busy ? <><Loader2 className="h-4 w-4 animate-spin" /> Saving…</> : product ? "Save changes" : `Add ${clothing ? "product" : "accessory"}`}</Button>
+        <Button type="submit" disabled={busy}>{busy ? <><Loader2 className="h-4 w-4 animate-spin" /> Saving…</> : product ? "Save changes" : "Add product"}</Button>
       </div>
     </form>
   );

@@ -59,7 +59,7 @@ describe("<OrdersAdmin />", () => {
     render(<OrdersAdmin initial={all} />);
     const d = await openOrder(user, "LC-COD-1");
     expect(within(d).getByText("Priya Singh")).toBeInTheDocument();
-    expect(within(d).getByText("Dell Latitude 5420")).toBeInTheDocument();
+    expect(within(d).getByText("Maroon Anarkali Suit")).toBeInTheDocument();
     expect(within(d).getByText("411001", { exact: false })).toBeInTheDocument();
     expect(within(d).getByRole("link", { name: /WhatsApp/ })).toHaveAttribute("href", expect.stringContaining("https://wa.me/919811120002"));
     expect(within(d).getByRole("link", { name: /Call/ })).toHaveAttribute("href", "tel:+919811120002");
@@ -128,17 +128,17 @@ describe("<OrdersAdmin />", () => {
 
 const cart = (over: Partial<AdminCart> = {}): AdminCart => ({
   userId: "u1", customer: { name: "Ravi Kumar", email: "ravi@x.com", phone: "9876543210" },
-  items: [{ productId: "p1", slug: "dell", name: "Dell Latitude 5420", brand: "Dell", price: 32999, quantity: 1, addedAt: new Date().toISOString(), art: { kind: "laptop", tone: "silver", hue: 200 }, available: 3 }],
+  items: [{ productId: "p1", slug: "maroon-suit", name: "Maroon Anarkali Suit", brand: "", price: 32999, quantity: 1, addedAt: new Date().toISOString(), art: { kind: "cloth", tone: "silver", hue: 200 }, available: 3 }],
   total: 32999, updatedAt: new Date().toISOString(), ...over,
 });
 
 describe("<CartsAdmin /> (who added what)", () => {
   it("shows each customer with their items, quantities, totals and when they added them", () => {
-    render(<CartsAdmin initial={[cart(), cart({ userId: "u2", customer: { name: "Priya Singh", email: "priya@x.com", phone: "9811120002" }, total: 599, items: [{ ...cart().items[0], productId: "p2", name: "Logitech Mouse", price: 599, quantity: 2 }] })]} />);
+    render(<CartsAdmin initial={[cart(), cart({ userId: "u2", customer: { name: "Priya Singh", email: "priya@x.com", phone: "9811120002" }, total: 599, items: [{ ...cart().items[0], productId: "p2", name: "Cotton Dupatta", price: 599, quantity: 2 }] })]} />);
     expect(screen.getByText("Ravi Kumar")).toBeInTheDocument();
-    expect(screen.getByText("Dell Latitude 5420")).toBeInTheDocument();
+    expect(screen.getByText("Maroon Anarkali Suit")).toBeInTheDocument();
     expect(screen.getByText("Priya Singh")).toBeInTheDocument();
-    expect(screen.getByText("Logitech Mouse")).toBeInTheDocument();
+    expect(screen.getByText("Cotton Dupatta")).toBeInTheDocument();
     expect(screen.getAllByText(/added/).length).toBeGreaterThan(1);
     expect(screen.getByText("₹32,999", { selector: "p.text-lg" })).toBeInTheDocument();
   });
@@ -147,7 +147,7 @@ describe("<CartsAdmin /> (who added what)", () => {
     render(<CartsAdmin initial={[cart()]} />);
     const wa = screen.getByRole("link", { name: /WhatsApp|Remind/i });
     expect(wa.getAttribute("href")).toContain("https://wa.me/919876543210?text=");
-    expect(decodeURIComponent(wa.getAttribute("href")!)).toContain("Dell Latitude 5420");
+    expect(decodeURIComponent(wa.getAttribute("href")!)).toContain("Maroon Anarkali Suit");
     expect(screen.getByRole("link", { name: /Call/ })).toHaveAttribute("href", "tel:+919876543210");
   });
 

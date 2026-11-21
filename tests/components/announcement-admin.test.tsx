@@ -5,15 +5,15 @@ import { toast } from "sonner";
 import { AnnouncementAdmin } from "@/components/admin/announcement-admin";
 import { mockFetch, sentBody, sentMethod } from "../helpers";
 
-const a1 = { id: "64b7f0c2a1b2c3d4e5f60301", text: "Free delivery on every laptop", active: true };
-const a2 = { id: "64b7f0c2a1b2c3d4e5f60302", text: "Back-to-college bundle", href: "/laptops", active: false };
+const a1 = { id: "64b7f0c2a1b2c3d4e5f60301", text: "Free delivery on every order", active: true };
+const a2 = { id: "64b7f0c2a1b2c3d4e5f60302", text: "Festive bundle", href: "/shop", active: false };
 
 describe("<AnnouncementAdmin /> (Top bar CRUD)", () => {
   it("lists messages with live/hidden state", () => {
     render(<AnnouncementAdmin initial={[a1, a2]} />);
     expect(screen.getByRole("switch", { name: /Hide Free delivery/ })).toBeChecked();
-    expect(screen.getByRole("switch", { name: /Show Back-to-college/ })).not.toBeChecked();
-    expect(screen.getByText("/laptops")).toBeInTheDocument();
+    expect(screen.getByRole("switch", { name: /Show Festive bundle/ })).not.toBeChecked();
+    expect(screen.getByText("/shop")).toBeInTheDocument();
   });
 
   it("only previews the active messages", () => {

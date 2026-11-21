@@ -31,11 +31,10 @@ const slugify = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, "-").repla
 
 export const products: Product[] = rows.map((r, i) => ({
   id: `cl-${String(i + 1).padStart(3, "0")}`, slug: slugify(r.name), type: "clothing", name: r.name, brand: "", price: r.price, mrp: r.mrp,
-  condition: "New", stock: "in-stock", category: r.category, tags: [],
+  stock: "in-stock", category: r.category, tags: [],
   specs: { Fabric: r.fabric }, highlights: [`${r.fabric} fabric`, `${r.fit} fit`, `Perfect for ${r.occasion.toLowerCase()}`],
-  included: [], conditionNotes: [],
   description: `${r.name} in soft, breathable ${r.fabric.toLowerCase()}. A ${r.fit.toLowerCase()} silhouette that is easy to carry all day — styled for ${r.occasion.toLowerCase()} moments. Replace this sample text with your own description.`,
-  warranty: "", featured: !!r.featured, views: r.views, createdAt: day(r.age),
+  featured: !!r.featured, views: r.views, createdAt: day(r.age),
   art: { kind: "cloth", tone: "silver", hue: r.hue },
   sizes: r.sizes ?? SIZES, colors: r.colors.map((c) => palette[c]), fabric: r.fabric, fit: r.fit, occasion: r.occasion,
   washCare: "Hand wash separately in cold water. Do not bleach. Dry in shade. Iron on low heat.", badges: r.badges ?? [],

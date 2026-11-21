@@ -16,16 +16,16 @@ describe("Dashboard page (server component)", () => {
   it("shows live totals, most viewed product and recent enquiries", async () => {
     vi.mocked(getDashboard).mockResolvedValue({
       shop: { revenue: 125000, ordersThisMonth: 4, toProcess: 2, activeCarts: 3, customers: 9, lowStock: 1 },
-      laptops: 12, accessories: 8, thisMonth: 5, fresh: 2, weekly: [1, 0, 3, 2, 4, 1, 5],
-      top: [makeProduct({ name: "MacBook Air M1", views: 1320 }), makeProduct({ id: "2", name: "Dell Latitude", views: 800 })],
-      recent: [makeEnquiry({ name: "Priya Singh", message: "Bulk pricing for 10 laptops?" })],
+      products: 20, thisMonth: 5, fresh: 2, weekly: [1, 0, 3, 2, 4, 1, 5],
+      top: [makeProduct({ name: "Anarkali Suit", views: 1320 }), makeProduct({ id: "2", name: "Maroon Suit", views: 800 })],
+      recent: [makeEnquiry({ name: "Priya Singh", message: "Bulk pricing for 10 suit sets?" })],
       recentOrders: [], recentCustomers: [], lowStockItems: [],
     });
     render(await DashboardPage());
-    expect(screen.getByText("20")).toBeInTheDocument(); // 12 + 8
-    expect(screen.getByText("12 clothing, 8 accessories")).toBeInTheDocument();
+    expect(screen.getByText("20")).toBeInTheDocument(); 
+    expect(screen.getAllByText("listed on the website")[0]).toBeInTheDocument();
     expect(screen.getByText("2 waiting for a reply")).toBeInTheDocument();
-    expect(screen.getAllByText("MacBook Air M1").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("Anarkali Suit").length).toBeGreaterThan(0);
     expect(screen.getByText("1,320 views")).toBeInTheDocument();
     expect(screen.getByText("Priya Singh")).toBeInTheDocument();
     expect(screen.getByRole("img", { name: /1, 0, 3, 2, 4, 1, 5/ })).toBeInTheDocument();
@@ -34,7 +34,7 @@ describe("Dashboard page (server component)", () => {
   it("shows shop numbers: revenue, orders to process, active carts and a low-stock warning", async () => {
     vi.mocked(getDashboard).mockResolvedValue({
       shop: { revenue: 125000, ordersThisMonth: 4, toProcess: 2, activeCarts: 3, customers: 9, lowStock: 2 },
-      laptops: 1, accessories: 1, thisMonth: 0, fresh: 0, weekly: [0, 0, 0, 0, 0, 0, 0], top: [], recent: [], recentOrders: [], recentCustomers: [], lowStockItems: [],
+      products: 2, thisMonth: 0, fresh: 0, weekly: [0, 0, 0, 0, 0, 0, 0], top: [], recent: [], recentOrders: [], recentCustomers: [], lowStockItems: [],
     });
     render(await DashboardPage());
     expect(screen.getByText("₹1,25,000")).toBeInTheDocument();
@@ -46,7 +46,7 @@ describe("Dashboard page (server component)", () => {
   });
 
   it("handles a brand-new store with no data", async () => {
-    vi.mocked(getDashboard).mockResolvedValue({ shop: { revenue: 0, ordersThisMonth: 0, toProcess: 0, activeCarts: 0, customers: 0, lowStock: 0 }, laptops: 0, accessories: 0, thisMonth: 0, fresh: 0, weekly: [0, 0, 0, 0, 0, 0, 0], top: [], recent: [], recentOrders: [], recentCustomers: [], lowStockItems: [] });
+    vi.mocked(getDashboard).mockResolvedValue({ shop: { revenue: 0, ordersThisMonth: 0, toProcess: 0, activeCarts: 0, customers: 0, lowStock: 0 }, products: 0, thisMonth: 0, fresh: 0, weekly: [0, 0, 0, 0, 0, 0, 0], top: [], recent: [], recentOrders: [], recentCustomers: [], lowStockItems: [] });
     render(await DashboardPage());
     expect(screen.getByText("No views yet")).toBeInTheDocument();
     expect(screen.getByText(/No enquiries yet/)).toBeInTheDocument();
@@ -58,7 +58,7 @@ describe("Dashboard tables", () => {
   it("lists recent orders, new customers and low-stock products", async () => {
     vi.mocked(getDashboard).mockResolvedValue({
       shop: { revenue: 0, ordersThisMonth: 1, toProcess: 1, activeCarts: 0, customers: 1, lowStock: 1 },
-      laptops: 1, accessories: 0, thisMonth: 0, fresh: 0, weekly: [0, 0, 0, 0, 0, 0, 0], top: [], recent: [],
+      products: 1, thisMonth: 0, fresh: 0, weekly: [0, 0, 0, 0, 0, 0, 0], top: [], recent: [],
       recentOrders: [makeOrder({ orderNumber: "LC-TABLE-1" })],
       recentCustomers: [{ id: "c1", name: "Meera Joshi", email: "meera@x.com", phone: "9000000001", createdAt: "2026-10-01T10:00:00.000Z" }],
       lowStockItems: [makeProduct({ id: "9", name: "Last Few Kurti", quantity: 2 })],

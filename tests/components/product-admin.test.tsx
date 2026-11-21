@@ -9,9 +9,9 @@ import { mockFetch, sentBody, sentMethod } from "../helpers";
 const suit = makeProduct({
   type: "clothing", name: "Maroon Anarkali Suit", brand: "", category: "Suit Sets", price: 2499, mrp: 3499, quantity: 8,
   art: { kind: "cloth", tone: "silver", hue: 340 }, sizes: [{ label: "S", qty: 0 }, { label: "M", qty: 2 }, { label: "L", qty: 6 }],
-  colors: [{ name: "Maroon", hex: "#8c1d40" }], fabric: "Pure cotton", badges: ["Best Seller"], condition: "New",
+  colors: [{ name: "Maroon", hex: "#8c1d40" }], fabric: "Pure cotton", badges: ["Best Seller"],
 });
-const saree = makeProduct({ id: "64b7f0c2a1b2c3d4e5f60002", slug: "silk-saree", type: "clothing", name: "Silk Saree", brand: "", category: "Sarees", price: 4999, mrp: undefined, stock: "low", stockCount: 2, quantity: 2, art: { kind: "cloth", tone: "silver", hue: 20 }, sizes: [{ label: "Free Size", qty: 2 }], condition: "New" });
+const saree = makeProduct({ id: "64b7f0c2a1b2c3d4e5f60002", slug: "silk-saree", type: "clothing", name: "Silk Saree", brand: "", category: "Sarees", price: 4999, mrp: undefined, stock: "low", stockCount: 2, quantity: 2, art: { kind: "cloth", tone: "silver", hue: 20 }, sizes: [{ label: "Free Size", qty: 2 }], });
 
 const table = () => screen.getByRole("table");
 const openAdd = async (user: ReturnType<typeof userEvent.setup>) => {
@@ -21,7 +21,7 @@ const openAdd = async (user: ReturnType<typeof userEvent.setup>) => {
 
 describe("<ProductAdmin /> list", () => {
   it("shows every product with collection, price, size-wise stock and status", () => {
-    render(<ProductAdmin type="clothing" initial={[suit, saree]} />);
+    render(<ProductAdmin initial={[suit, saree]} />);
     const t = within(table());
     expect(t.getByText("Maroon Anarkali Suit")).toBeInTheDocument();
     expect(t.getByText("Suit Sets")).toBeInTheDocument();
@@ -33,7 +33,7 @@ describe("<ProductAdmin /> list", () => {
 
   it("filters by search text and shows an empty state when nothing matches", async () => {
     const user = userEvent.setup();
-    render(<ProductAdmin type="clothing" initial={[suit, saree]} />);
+    render(<ProductAdmin initial={[suit, saree]} />);
     await user.type(screen.getByLabelText("Search products"), "saree");
     expect(within(table()).queryByText("Maroon Anarkali Suit")).not.toBeInTheDocument();
     expect(within(table()).getByText("Silk Saree")).toBeInTheDocument();
@@ -46,9 +46,9 @@ describe("<ProductAdmin /> list", () => {
   });
 
   it("shows a friendly empty state with an add button when there are no products", () => {
-    render(<ProductAdmin type="accessory" initial={[]} />);
-    expect(screen.getByText("No accessories yet")).toBeInTheDocument();
-    expect(screen.getAllByRole("button", { name: /add accessory/i }).length).toBeGreaterThan(0);
+    render(<ProductAdmin initial={[]} />);
+    expect(screen.getByText("No products yet")).toBeInTheDocument();
+    expect(screen.getAllByRole("button", { name: /add product/i }).length).toBeGreaterThan(0);
   });
 });
 
@@ -56,7 +56,7 @@ describe("<ProductAdmin /> delete", () => {
   it("asks for confirmation, calls the API and removes the row", async () => {
     const user = userEvent.setup();
     const fetchMock = mockFetch(() => ({ body: { ok: true } }));
-    render(<ProductAdmin type="clothing" initial={[suit, saree]} />);
+    render(<ProductAdmin initial={[suit, saree]} />);
     await user.click(within(table()).getByRole("button", { name: "Delete Maroon Anarkali Suit" }));
     expect(screen.getByRole("dialog", { name: "Delete this product?" })).toBeInTheDocument();
     expect(fetchMock).not.toHaveBeenCalled();
@@ -69,7 +69,7 @@ describe("<ProductAdmin /> delete", () => {
   it("cancel keeps the product", async () => {
     const user = userEvent.setup();
     const fetchMock = mockFetch(() => ({}));
-    render(<ProductAdmin type="clothing" initial={[suit]} />);
+    render(<ProductAdmin initial={[suit]} />);
     await user.click(within(table()).getByRole("button", { name: "Delete Maroon Anarkali Suit" }));
     await user.click(screen.getByRole("button", { name: "Cancel" }));
     expect(fetchMock).not.toHaveBeenCalled();
@@ -79,7 +79,7 @@ describe("<ProductAdmin /> delete", () => {
   it("keeps the row and shows an error when the server fails", async () => {
     const user = userEvent.setup();
     mockFetch(() => ({ status: 500, body: { error: "Database is down" } }));
-    render(<ProductAdmin type="clothing" initial={[suit]} />);
+    render(<ProductAdmin initial={[suit]} />);
     await user.click(within(table()).getByRole("button", { name: "Delete Maroon Anarkali Suit" }));
     await user.click(screen.getByRole("button", { name: "Delete product" }));
     await waitFor(() => expect(toast.error).toHaveBeenCalledWith("Could not delete", { description: "Database is down" }));
@@ -91,7 +91,7 @@ describe("<ProductAdmin /> add & edit (clothing)", () => {
   it("validates before sending anything", async () => {
     const user = userEvent.setup();
     const fetchMock = mockFetch(() => ({}));
-    render(<ProductAdmin type="clothing" initial={[]} />);
+    render(<ProductAdmin initial={[]} />);
     const form = await openAdd(user);
     await user.click(within(form).getByRole("button", { name: "Add product" }));
     expect(await screen.findByText("Enter the product name")).toBeInTheDocument();
@@ -104,7 +104,7 @@ describe("<ProductAdmin /> add & edit (clothing)", () => {
     const user = userEvent.setup();
     const created = makeProduct({ ...suit, id: "64b7f0c2a1b2c3d4e5f69999", name: "Green Palazzo Suit" });
     const fetchMock = mockFetch(() => ({ status: 201, body: created }));
-    render(<ProductAdmin type="clothing" initial={[]} />);
+    render(<ProductAdmin initial={[]} />);
     const form = await openAdd(user);
     await user.type(within(form).getByLabelText("Name"), "Green Palazzo Suit");
     await user.type(within(form).getByLabelText("Collection"), "Suit Sets");
@@ -138,7 +138,7 @@ describe("<ProductAdmin /> add & edit (clothing)", () => {
   it("without sizes, units in stock is required", async () => {
     const user = userEvent.setup();
     const fetchMock = mockFetch(() => ({}));
-    render(<ProductAdmin type="clothing" initial={[]} />);
+    render(<ProductAdmin initial={[]} />);
     const form = await openAdd(user);
     await user.type(within(form).getByLabelText("Name"), "Plain Dupatta Set");
     await user.type(within(form).getByLabelText("Collection"), "Suit Sets");
@@ -153,7 +153,7 @@ describe("<ProductAdmin /> add & edit (clothing)", () => {
   it("keeps the form open and shows the server error if saving fails", async () => {
     const user = userEvent.setup();
     mockFetch(() => ({ status: 400, body: { error: "Enter a collection / category" } }));
-    render(<ProductAdmin type="clothing" initial={[]} />);
+    render(<ProductAdmin initial={[]} />);
     const form = await openAdd(user);
     await user.type(within(form).getByLabelText("Name"), "Some Suit Set");
     await user.type(within(form).getByLabelText("Collection"), "Suit Sets");
@@ -168,7 +168,7 @@ describe("<ProductAdmin /> add & edit (clothing)", () => {
     const user = userEvent.setup();
     const updated = { ...suit, price: 2299 };
     const fetchMock = mockFetch(() => ({ body: updated }));
-    render(<ProductAdmin type="clothing" initial={[suit]} />);
+    render(<ProductAdmin initial={[suit]} />);
     await user.click(within(table()).getByRole("button", { name: "Edit Maroon Anarkali Suit" }));
     const form = screen.getByRole("dialog", { name: "Edit product" });
     expect(within(form).getByLabelText("Name")).toHaveValue("Maroon Anarkali Suit");
@@ -187,7 +187,7 @@ describe("<ProductAdmin /> add & edit (clothing)", () => {
   it("a size set to 0 is sent as sold out for that size", async () => {
     const user = userEvent.setup();
     const fetchMock = mockFetch(() => ({ body: suit }));
-    render(<ProductAdmin type="clothing" initial={[suit]} />);
+    render(<ProductAdmin initial={[suit]} />);
     await user.click(within(table()).getByRole("button", { name: "Edit Maroon Anarkali Suit" }));
     const form = screen.getByRole("dialog", { name: "Edit product" });
     const m = within(form).getByLabelText("Stock for size M");
@@ -198,12 +198,4 @@ describe("<ProductAdmin /> add & edit (clothing)", () => {
     expect(sentBody(fetchMock).sizes).toContainEqual({ label: "M", qty: 0 });
   });
 
-  it("accessory form has no sizes, only units in stock", async () => {
-    const user = userEvent.setup();
-    render(<ProductAdmin type="accessory" initial={[]} />);
-    await user.click(screen.getAllByRole("button", { name: "Add accessory" })[0]);
-    const form = screen.getByRole("dialog", { name: "Add accessory" });
-    expect(within(form).queryByText("Sizes & stock")).not.toBeInTheDocument();
-    expect(within(form).getByLabelText("Units in stock")).toBeInTheDocument();
-  });
 });

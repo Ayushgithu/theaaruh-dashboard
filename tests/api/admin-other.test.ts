@@ -28,7 +28,7 @@ const me = { id: ID, email: "owner@shop.com", name: "Owner" };
 beforeEach(() => vi.mocked(getSession).mockResolvedValue(me));
 
 describe("banners", () => {
-  const body = { title: "Festive sale", subtitle: "Up to 60% off", cta: "Shop", href: "/laptops", theme: "blue", active: true };
+  const body = { title: "Festive sale", subtitle: "Up to 60% off", cta: "Shop", href: "/shop", theme: "blue", active: true };
 
   it("POST creates a banner", async () => {
     Banner.create.mockResolvedValue({ _id: ID });

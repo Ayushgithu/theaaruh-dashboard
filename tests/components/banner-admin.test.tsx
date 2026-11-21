@@ -7,13 +7,13 @@ import { makeBanner } from "../fixtures";
 import { mockFetch, sentBody, sentMethod } from "../helpers";
 
 const sale = makeBanner();
-const paused = makeBanner({ id: "64b7f0c2a1b2c3d4e5f60102", title: "Back-to-college bundle", active: false });
+const paused = makeBanner({ id: "64b7f0c2a1b2c3d4e5f60102", title: "Festive bundle", active: false });
 
 describe("<BannerAdmin />", () => {
   it("lists banners with their on/off state", () => {
     render(<BannerAdmin initial={[sale, paused]} />);
-    expect(screen.getByRole("switch", { name: /Hide Festive laptop sale/ })).toBeChecked();
-    expect(screen.getByRole("switch", { name: /Show Back-to-college bundle/ })).not.toBeChecked();
+    expect(screen.getByRole("switch", { name: /Hide Festive suit sale/ })).toBeChecked();
+    expect(screen.getByRole("switch", { name: /Show Festive bundle/ })).not.toBeChecked();
   });
 
   it("shows an empty state with no banners", () => {
@@ -25,8 +25,8 @@ describe("<BannerAdmin />", () => {
     const user = userEvent.setup();
     const fetchMock = mockFetch(() => ({}));
     render(<BannerAdmin initial={[sale]} />);
-    await user.click(screen.getByRole("switch", { name: /Hide Festive laptop sale/ }));
-    expect(screen.getByRole("switch", { name: /Show Festive laptop sale/ })).not.toBeChecked();
+    await user.click(screen.getByRole("switch", { name: /Hide Festive suit sale/ }));
+    expect(screen.getByRole("switch", { name: /Show Festive suit sale/ })).not.toBeChecked();
     await waitFor(() => expect(fetchMock).toHaveBeenCalled());
     expect(fetchMock.mock.calls[0][0]).toBe(`/api/admin/banners/${sale.id}`);
     expect(sentMethod(fetchMock)).toBe("PUT");
@@ -38,9 +38,9 @@ describe("<BannerAdmin />", () => {
     const user = userEvent.setup();
     mockFetch(() => ({ status: 500, body: { error: "Nope" } }));
     render(<BannerAdmin initial={[sale]} />);
-    await user.click(screen.getByRole("switch", { name: /Hide Festive laptop sale/ }));
+    await user.click(screen.getByRole("switch", { name: /Hide Festive suit sale/ }));
     await waitFor(() => expect(toast.error).toHaveBeenCalledWith("Could not update banner", { description: "Nope" }));
-    expect(screen.getByRole("switch", { name: /Hide Festive laptop sale/ })).toBeChecked();
+    expect(screen.getByRole("switch", { name: /Hide Festive suit sale/ })).toBeChecked();
   });
 
   it("creates a banner via POST", async () => {
@@ -50,7 +50,7 @@ describe("<BannerAdmin />", () => {
     await user.click(screen.getAllByRole("button", { name: /Add banner/ })[0]);
     const form = screen.getByRole("dialog", { name: "Add banner" });
     await user.type(within(form).getByLabelText("Headline"), "Diwali dhamaka sale");
-    await user.type(within(form).getByLabelText("Supporting text"), "Extra 10% off on accessories");
+    await user.type(within(form).getByLabelText("Supporting text"), "Extra 10% off on sarees");
     await user.click(within(form).getByRole("button", { name: "Add banner" }));
 
     await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(1));
@@ -63,11 +63,11 @@ describe("<BannerAdmin />", () => {
     const user = userEvent.setup();
     const fetchMock = mockFetch(() => ({}));
     render(<BannerAdmin initial={[sale]} />);
-    await user.click(screen.getByRole("button", { name: "Edit Festive laptop sale" }));
+    await user.click(screen.getByRole("button", { name: "Edit Festive suit sale" }));
     const form = screen.getByRole("dialog", { name: "Edit banner" });
     const link = within(form).getByLabelText("Button link");
     await user.clear(link);
-    await user.type(link, "laptops");
+    await user.type(link, "shop");
     await user.click(within(form).getByRole("button", { name: "Save changes" }));
     expect(await within(form).findByText(/Use a page path/)).toBeInTheDocument();
     expect(fetchMock).not.toHaveBeenCalled();
@@ -77,10 +77,10 @@ describe("<BannerAdmin />", () => {
     const user = userEvent.setup();
     const fetchMock = mockFetch(() => ({}));
     render(<BannerAdmin initial={[sale, paused]} />);
-    await user.click(screen.getByRole("button", { name: "Delete Festive laptop sale" }));
+    await user.click(screen.getByRole("button", { name: "Delete Festive suit sale" }));
     await user.click(screen.getByRole("button", { name: "Delete banner" }));
-    await waitFor(() => expect(screen.queryAllByText("Festive laptop sale")).toHaveLength(0));
+    await waitFor(() => expect(screen.queryAllByText("Festive suit sale")).toHaveLength(0));
     expect(fetchMock).toHaveBeenCalledWith(`/api/admin/banners/${sale.id}`, expect.objectContaining({ method: "DELETE" }));
-    expect(screen.getAllByText("Back-to-college bundle").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("Festive bundle").length).toBeGreaterThan(0);
   });
 });

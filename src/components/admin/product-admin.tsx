@@ -2,13 +2,13 @@
 import * as React from "react";
 import { Pencil, Plus, Search, Trash2, PackageSearch } from "lucide-react";
 import { toast } from "sonner";
-import type { Product, ProductType } from "@/lib/types";
+import type { Product } from "@/lib/types";
 import { postJson } from "@/lib/api";
 import { formatPrice } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/form";
 import { Dialog } from "@/components/ui/drawer";
-import { ConditionBadge, StockBadge } from "@/components/ui/badge";
+import { StockBadge } from "@/components/ui/badge";
 import { ProductVisual } from "@/components/shared/product-art";
 import { AdminPageHeader } from "./shell";
 import { ProductForm } from "./product-form";
@@ -23,10 +23,9 @@ function SizeChips({ p }: { p: Product }) {
   );
 }
 
-export function ProductAdmin({ type, initial }: { type: ProductType; initial: Product[] }) {
-  const noun = type === "accessory" ? "accessory" : "product";
-  const plural = type === "accessory" ? "accessories" : "products";
-  const clothing = type !== "accessory";
+export function ProductAdmin({ initial }: { initial: Product[] }) {
+  const noun = "product";
+  const plural = "products";
   const [items, setItems] = React.useState<Product[]>(initial);
   const [q, setQ] = React.useState("");
   const [editing, setEditing] = React.useState<Product | "new" | null>(null);
@@ -64,9 +63,9 @@ export function ProductAdmin({ type, initial }: { type: ProductType; initial: Pr
   return (
     <>
       <AdminPageHeader
-        title={type === "accessory" ? "Accessories" : "Clothing"}
+        title="Clothing"
         description={`${items.length} ${plural} listed`}
-        action={<div className="flex flex-wrap gap-2">{clothing && <BulkUpload />}<Button onClick={() => setEditing("new")}><Plus className="h-4 w-4" /> Add {noun}</Button></div>}
+        action={<div className="flex flex-wrap gap-2"><BulkUpload /><Button onClick={() => setEditing("new")}><Plus className="h-4 w-4" /> Add {noun}</Button></div>}
       />
 
       <div className="relative mb-4 max-w-md">
@@ -88,7 +87,7 @@ export function ProductAdmin({ type, initial }: { type: ProductType; initial: Pr
             <table className="w-full min-w-[720px] text-sm">
               <thead className="bg-surface text-left text-xs font-semibold text-body">
                 <tr>
-                  <th className="px-4 py-3">Product</th><th className="px-4 py-3">Price</th><th className="px-4 py-3">{clothing ? "Sizes in stock" : "Condition"}</th>
+                  <th className="px-4 py-3">Product</th><th className="px-4 py-3">Price</th><th className="px-4 py-3">Sizes in stock</th>
                   <th className="px-4 py-3">Stock</th><th className="px-4 py-3">Views</th><th className="px-4 py-3 text-right">Actions</th>
                 </tr>
               </thead>
@@ -102,7 +101,7 @@ export function ProductAdmin({ type, initial }: { type: ProductType; initial: Pr
                       </div>
                     </td>
                     <td className="px-4 py-3 font-semibold text-ink">{formatPrice(p.price)}</td>
-                    <td className="px-4 py-3">{clothing ? <SizeChips p={p} /> : <ConditionBadge condition={p.condition} />}</td>
+                    <td className="px-4 py-3"><SizeChips p={p} /></td>
                     <td className="px-4 py-3"><StockBadge stock={p.stock} count={p.stockCount} /></td>
                     <td className="px-4 py-3">{p.views.toLocaleString("en-IN")}</td>
                     <td className="px-4 py-3">
@@ -126,7 +125,7 @@ export function ProductAdmin({ type, initial }: { type: ProductType; initial: Pr
                   <div className="min-w-0 flex-1">
                     <p className="font-semibold leading-snug text-ink">{p.name}</p>
                     <p className="mt-0.5 text-sm font-bold text-ink">{formatPrice(p.price)}</p>
-                    <div className="mt-2 flex flex-wrap items-center gap-2">{clothing ? <SizeChips p={p} /> : <ConditionBadge condition={p.condition} />}<StockBadge stock={p.stock} count={p.stockCount} /></div>
+                    <div className="mt-2 flex flex-wrap items-center gap-2"><SizeChips p={p} /><StockBadge stock={p.stock} count={p.stockCount} /></div>
                   </div>
                 </div>
                 <div className="mt-3 grid grid-cols-2 gap-2">
@@ -140,7 +139,7 @@ export function ProductAdmin({ type, initial }: { type: ProductType; initial: Pr
       )}
 
       <Dialog open={editing !== null} onClose={() => setEditing(null)} wide title={editing === "new" ? `Add ${noun}` : `Edit ${noun}`}>
-        {editing !== null && <ProductForm key={editing === "new" ? "new" : editing.id} type={type} categories={[...new Set(items.map((x) => x.category))]} product={editing === "new" ? null : editing} onSave={save} onCancel={() => setEditing(null)} />}
+        {editing !== null && <ProductForm key={editing === "new" ? "new" : editing.id} categories={[...new Set(items.map((x) => x.category))]} product={editing === "new" ? null : editing} onSave={save} onCancel={() => setEditing(null)} />}
       </Dialog>
 
       <Dialog

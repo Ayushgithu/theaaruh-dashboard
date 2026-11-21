@@ -13,12 +13,11 @@ export const dynamic = "force-dynamic";
 
 export default async function DashboardPage() {
   const d = await getDashboard();
-  const total = d.laptops + d.accessories;
   const max = Math.max(1, ...d.weekly);
   const best = d.top[0];
 
   const stats = [
-    { label: "Total products", value: String(total), note: `${d.laptops} clothing, ${d.accessories} accessories`, Icon: Package },
+    { label: "Total products", value: String(d.products), note: "listed on the website", Icon: Package },
     { label: "Enquiries this month", value: String(d.thisMonth), note: `${d.fresh} waiting for a reply`, Icon: Inbox },
     { label: "Most viewed product", value: best ? best.name : "No views yet", note: best ? `${best.views.toLocaleString("en-IN")} views` : "Views appear as customers browse", Icon: TrendingUp, small: true },
   ];

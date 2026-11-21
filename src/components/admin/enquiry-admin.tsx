@@ -4,7 +4,6 @@ import { Inbox, Phone, Search } from "lucide-react";
 import { toast } from "sonner";
 import type { Enquiry, EnquiryStatus } from "@/lib/types";
 import { postJson } from "@/lib/api";
-import { formatPrice } from "@/lib/utils";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/form";
@@ -41,7 +40,7 @@ export function EnquiryAdmin({ initial }: { initial: Enquiry[] }) {
 
   return (
     <>
-      <AdminPageHeader title="Enquiries" description="Messages from the contact form, product enquiries and sell requests." />
+      <AdminPageHeader title="Enquiries" description="Messages from the contact form and product enquiries." />
 
       <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div role="tablist" aria-label="Filter by status" className="no-scrollbar flex gap-1 overflow-x-auto rounded-sm bg-card p-1 shadow-card ring-1 ring-line">
@@ -111,25 +110,6 @@ export function EnquiryAdmin({ initial }: { initial: Enquiry[] }) {
               <div><dt className="text-xs">Received</dt><dd className="mt-0.5 font-medium text-ink">{fmt(open.createdAt)}</dd></div>
             </dl>
             <div><p className="text-xs">Message</p><p className="mt-1 rounded-sm bg-surface p-4 text-sm leading-relaxed text-ink">{open.message}</p></div>
-            {open.sell && (
-              <div className="rounded-sm border border-line p-4 text-sm">
-                <p className="font-semibold text-ink">{open.sell.brand} {open.sell.model}</p>
-                <p className="mt-1">Condition: {open.sell.condition}</p>
-                <p>Expected price: <span className="font-semibold text-ink">{formatPrice(open.sell.expectedPrice)}</span> · City: {open.sell.city}</p>
-                {open.sell.photos.length > 0 && (
-                  <ul className="mt-3 grid grid-cols-3 gap-2 sm:grid-cols-5">
-                    {open.sell.photos.map((u, i) => (
-                      <li key={u}>
-                        <a href={u} target="_blank" rel="noopener noreferrer" className="block aspect-square overflow-hidden rounded-lg border border-line">
-                          {/* eslint-disable-next-line @next/next/no-img-element */}
-                          <img src={u} alt={`Photo ${i + 1}`} className="h-full w-full object-cover" />
-                        </a>
-                      </li>
-                    ))}
-                  </ul>
-                )}
-              </div>
-            )}
             {open.products.length > 0 && (
               <div><p className="text-xs">Products</p><ul className="mt-1 flex flex-wrap gap-2">{open.products.map((p) => <li key={p} className="rounded-full bg-primary-faint px-3 py-1 text-sm font-medium text-primary">{p}</li>)}</ul></div>
             )}

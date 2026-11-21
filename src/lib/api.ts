@@ -21,13 +21,6 @@ export const postJson = <T = unknown>(url: string, body: unknown, method = "POST
 
 export const submitContact = (data: { name: string; phone: string; message: string }) => postJson("/api/contact", data);
 
-export function submitSellRequest(data: Record<string, string>, photos: File[]) {
-  const fd = new FormData();
-  for (const [k, v] of Object.entries(data)) fd.append(k, v);
-  photos.forEach((f) => fd.append("photos", f));
-  return request("/api/sell", { method: "POST", body: fd });
-}
-
 /** Phone photos are often 3-6 MB. Shrinking them here (max 1600px, WebP) keeps every upload small and fast. */
 async function shrink(file: File): Promise<File> {
   if (!file.type.startsWith("image/") || file.type === "image/gif" || file.type === "image/svg+xml") return file;

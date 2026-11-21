@@ -35,11 +35,11 @@ describe("Resend email", () => {
 
   it("sends through Resend with the reset link in html and text", async () => {
     vi.stubEnv("RESEND_API_KEY", "re_test_123");
-    vi.stubEnv("EMAIL_FROM", "Laptop Clinic <no-reply@shop.example>");
+    vi.stubEnv("EMAIL_FROM", "The Aaruh <no-reply@shop.example>");
     send.mockResolvedValue({ data: { id: "1" }, error: null });
     expect(await sendPasswordResetEmail(args)).toBe(true);
     const msg = send.mock.calls[0][0];
-    expect(msg).toMatchObject({ from: "Laptop Clinic <no-reply@shop.example>", to: "owner@shop.com", subject: expect.stringContaining("Reset") });
+    expect(msg).toMatchObject({ from: "The Aaruh <no-reply@shop.example>", to: "owner@shop.com", subject: expect.stringContaining("Reset") });
     expect(msg.html).toContain("token=abc");
     expect(msg.text).toContain(args.link);
   });

@@ -3,16 +3,16 @@ import * as React from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
-import { Bell, CheckCheck, Inbox, ShoppingBag, Tag } from "lucide-react";
+import { Bell, CheckCheck, Inbox, ShoppingBag } from "lucide-react";
 import { toast } from "sonner";
 import { cn, timeAgo } from "@/lib/utils";
 
-interface Note { id: string; kind: "order" | "sell" | "enquiry"; title: string; body: string; href: string; at: string }
+interface Note { id: string; kind: "order" | "enquiry"; title: string; body: string; href: string; at: string }
 
 const SEEN_KEY = "lc_admin_notif_seen";
 const POLL_MS = 15000;
-const ICON = { order: ShoppingBag, sell: Tag, enquiry: Inbox } as const;
-const TINT = { order: "bg-emerald-50 text-emerald-600", sell: "bg-amber-50 text-amber-600", enquiry: "bg-primary-faint text-primary" } as const;
+const ICON = { order: ShoppingBag, enquiry: Inbox } as const;
+const TINT = { order: "bg-emerald-50 text-emerald-600", enquiry: "bg-primary-faint text-primary" } as const;
 
 const DISMISSED_KEY = "lc_admin_notif_dismissed";
 const readDismissed = (): string[] => { try { const v = JSON.parse(localStorage.getItem(DISMISSED_KEY) ?? "[]"); return Array.isArray(v) ? v : []; } catch { return []; } };
@@ -21,7 +21,7 @@ const writeDismissed = (ids: string[]) => { try { localStorage.setItem(DISMISSED
 const readSeen = () => { try { const v = Number(localStorage.getItem(SEEN_KEY)); return v > 0 ? v : null; } catch { return null; } };
 const writeSeen = (t: number) => { try { localStorage.setItem(SEEN_KEY, String(t)); } catch {} };
 
-/** Dashboard bell: polls for new orders / sell requests / enquiries, toasts new ones and refreshes the page data. */
+/** Dashboard bell: polls for new orders and enquiries, toasts new ones and refreshes the page data. */
 export function NotificationBell() {
   const router = useRouter();
   const [items, setItems] = React.useState<Note[]>([]);
@@ -115,7 +115,7 @@ export function NotificationBell() {
             </button>
           </div>
           {visible.length === 0 && (
-            <p className="px-4 py-10 text-center text-sm">{items.length === 0 ? "Nothing yet. New orders and sell requests will show up here." : "You're all caught up. New orders and enquiries will appear here."}</p>
+            <p className="px-4 py-10 text-center text-sm">{items.length === 0 ? "Nothing yet. New orders and enquiries will show up here." : "You're all caught up. New orders and enquiries will appear here."}</p>
           )}
           {items.length > 0 && (
             <ul data-lenis-prevent className="max-h-[min(24rem,70dvh)] divide-y divide-line overflow-y-auto">

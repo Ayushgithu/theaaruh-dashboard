@@ -8,10 +8,9 @@ import { mockFetch, sentBody, sentMethod } from "../helpers";
 
 const items = [
   makeEnquiry(),
-  makeEnquiry({ id: "64b7f0c2a1b2c3d4e5f60202", name: "Priya Singh", phone: "+91 98111 20002", source: "Contact form", message: "Bulk pricing for 10 laptops?", products: [], status: "contacted" }),
+  makeEnquiry({ id: "64b7f0c2a1b2c3d4e5f60202", name: "Priya Singh", phone: "+91 98111 20002", source: "Contact form", message: "Bulk pricing for 10 suit sets?", products: [], status: "contacted" }),
   makeEnquiry({
-    id: "64b7f0c2a1b2c3d4e5f60203", name: "Karan Malhotra", source: "Sell request", message: "Selling a Dell XPS 13", products: [], status: "closed",
-    sell: { brand: "Dell", model: "XPS 13", condition: "Good", expectedPrice: 38000, city: "Delhi", photos: ["/api/images/64b7f0c2a1b2c3d4e5f60777"] },
+    id: "64b7f0c2a1b2c3d4e5f60203", name: "Karan Malhotra", source: "Product enquiry", message: "Is this suit set available in size M?", products: [], status: "closed",
   }),
 ];
 const table = () => within(screen.getByRole("table"));
@@ -55,21 +54,12 @@ describe("<EnquiryAdmin />", () => {
     render(<EnquiryAdmin initial={items} />);
     await user.click(table().getByText("Aarav Mehta"));
     const dialog = screen.getByRole("dialog", { name: "Enquiry details" });
-    expect(within(dialog).getByText("Is the MacBook Air still available?")).toBeInTheDocument();
-    expect(within(dialog).getByText("Apple MacBook Air M1")).toBeInTheDocument();
+    expect(within(dialog).getByText("Is the Maroon Anarkali Suit available in size M?")).toBeInTheDocument();
+    expect(within(dialog).getByText("Maroon Anarkali Suit")).toBeInTheDocument();
     expect(within(dialog).getByRole("link", { name: /Reply on WhatsApp/ })).toHaveAttribute("href", "https://wa.me/919811120001");
     expect(within(dialog).getByRole("link", { name: /Call/ })).toHaveAttribute("href", "tel:+919811120001");
   });
 
-  it("shows sell-request details with expected price and photos", async () => {
-    const user = userEvent.setup();
-    render(<EnquiryAdmin initial={items} />);
-    await user.click(table().getByText("Karan Malhotra"));
-    const dialog = screen.getByRole("dialog", { name: "Enquiry details" });
-    expect(within(dialog).getByText("Dell XPS 13")).toBeInTheDocument();
-    expect(within(dialog).getByText("₹38,000")).toBeInTheDocument();
-    expect(within(dialog).getByAltText("Photo 1")).toHaveAttribute("src", "/api/images/64b7f0c2a1b2c3d4e5f60777");
-  });
 
   it("changes status through the API and updates the badge", async () => {
     const user = userEvent.setup();
